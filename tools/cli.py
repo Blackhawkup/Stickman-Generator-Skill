@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Unified CLI for the Timed Slideshow Explainer system.
 
+Supports both 1-minute vertical Shorts (9:16) and 10-minute long-form explainer videos (16:9).
+When rendering a long-form video, an autonomous companion Short (first ~60s hook) is automatically generated.
+
 Commands:
-  python tools/cli.py new <slug> [--format 16:9|9:16|1:1]
+  python tools/cli.py new <slug> [--mode short|long] [--format 16:9|9:16|1:1]
   python tools/cli.py prompts <project>
   python tools/cli.py tts <project> [--voice Charon]
   python tools/cli.py voice <project> <audio.wav>
@@ -12,7 +15,9 @@ Commands:
   python tools/cli.py build <project>
   python tools/cli.py preview <project>
   python tools/cli.py render <project>
+  python tools/cli.py extract-short <project>
   python tools/cli.py auto <project> [--voice Charon]
+  python tools/cli.py topics [next|list|completed]
 """
 import argparse, json, os, platform, shutil, sys
 from pathlib import Path
@@ -53,20 +58,24 @@ def main():
 
     if cmd == 'new':
         parser.add_argument('slug')
-        parser.add_argument('--format', default='16:9', choices=['16:9', '9:16', '1:1'])
+        parser.add_argument('--mode', default='short', choices=['short', 'long'], help="Video mode: short (~1m) or long (~10m)")
+        parser.add_argument('--format', choices=['16:9', '9:16', '1:1'], help="Aspect ratio (defaults to 16:9 for long, 9:16 for short)")
         args = parser.parse_args(rest)
         dest = PROJECTS_DIR / args.slug
         if dest.exists():
             die(f"Project '{args.slug}' already exists at {dest}")
         dest.mkdir(parents=True, exist_ok=True)
         shutil.copytree(TEMPLATES_DIR, dest, dirs_exist_ok=True)
+        
         cfg = load_json(dest / 'film.json')
         cfg['slug'] = args.slug
-        cfg['format'] = args.format
+        cfg['mode'] = args.mode
+        cfg['format'] = args.format if args.format else ('16:9' if args.mode == 'long' else '9:16')
         save_json(dest / 'film.json', cfg)
         for d in ('images', 'voice', 'out', 'build'):
             (dest / d).mkdir(exist_ok=True)
         print(f"\n[Project Created] {dest}")
+        print(f"Mode: {cfg['mode'].upper()} | Format: {cfg['format']}")
 
     elif cmd == 'prompts':
         parser.add_argument('project')
@@ -140,13 +149,25 @@ def main():
         mix.mix_audio(pdir)
         if not check.check_project(pdir):
             print("\n[Notice] Proceeding despite warnings...")
-        slug = load_json(pdir / 'film.json').get('slug', pdir.name)
+        cfg = load_json(pdir / 'film.json')
+        slug = cfg.get('slug', pdir.name)
+        is_long = (cfg.get('mode') == 'long' or cfg.get('format') == '16:9')
         out_dir = pdir / 'out'
         out_dir.mkdir(exist_ok=True)
+        
         if cmd == 'preview':
             render.export_video(pdir, out_dir / 'preview.mp4', preview=True)
         else:
-            render.export_video(pdir, out_dir / f"{slug}.mp4", preview=False)
+            filename = f"{slug}-long.mp4" if is_long else f"{slug}.mp4"
+            render.export_video(pdir, out_dir / filename, preview=False)
+
+    elif cmd == 'extract-short':
+        parser.add_argument('project')
+        parser.add_argument('--max-duration', type=float, default=72.0)
+        args = parser.parse_args(rest)
+        pdir = resolve_project(args.project)
+        import extract_short
+        extract_short.extract_short(pdir, max_duration=args.max_duration)
 
     elif cmd == 'images':
         parser.add_argument('project')
@@ -162,12 +183,15 @@ def main():
         parser.add_argument('--voice', default='Charon')
         args = parser.parse_args(rest)
         pdir = resolve_project(args.project)
-        slug = load_json(pdir / 'film.json').get('slug', pdir.name)
+        cfg = load_json(pdir / 'film.json')
+        slug = cfg.get('slug', pdir.name)
+        is_long = (cfg.get('mode') == 'long' or cfg.get('format') == '16:9')
         script = Path(__file__).resolve().parent / 'generate_all_slides.mjs'
         import prompts, voice, mix, build, check, render, subprocess
 
+        mode_title = "10-MINUTE LONG FORM" if is_long else "1-MINUTE SHORT"
         print(f"\n============================================================")
-        print(f"[Auto Pipeline] Running autonomous production: {slug}")
+        print(f"[Auto Pipeline] Production: {slug} [{mode_title}]")
         print(f"============================================================")
         print("\n[Step 1/6] Compiling Prompts...")
         prompts.build_prompts(pdir)
@@ -187,21 +211,36 @@ def main():
         if not check.check_project(pdir):
             print("\n[Notice] Proceeding despite warnings...")
 
-        print("\n[Step 6/6] Rendering Final 60fps MP4...")
+        print("\n[Step 6/6] Rendering Primary 60fps MP4...")
         out_dir = pdir / 'out'
         out_dir.mkdir(exist_ok=True)
-        out_mp4 = out_dir / f"{slug}.mp4"
-        render.export_video(pdir, out_mp4, preview=False)
+        
+        if is_long:
+            out_mp4 = out_dir / f"{slug}-long.mp4"
+            render.export_video(pdir, out_mp4, preview=False)
+            
+            # Step 7: Automatically extract and render companion Short!
+            print("\n[Step 7/7] Automatically Extracting & Rendering Companion 1-Minute Short (9:16)...")
+            import extract_short
+            short_mp4 = out_dir / f"{slug}-short.mp4"
+            extract_short.extract_short(pdir, short_mp4)
+            print(f"\n============================================================")
+            print(f"[Auto Pipeline] Long-Form Production Complete!")
+            print(f" - Primary Video (16:9, ~10m): {out_mp4}")
+            print(f" - Companion Short (9:16, ~1m): {short_mp4}")
+            print(f"============================================================")
+        else:
+            out_mp4 = out_dir / f"{slug}.mp4"
+            render.export_video(pdir, out_mp4, preview=False)
+            print(f"\n[Auto Pipeline] Short Complete! Deliverable: {out_mp4}")
 
         # Record in completed topics ledger
         from common import probe_duration
         import topics
-        cfg = load_json(pdir / 'film.json')
         topic_name = cfg.get('topic', cfg.get('title', slug))
         slides = load_json(pdir / 'slides.json')
         dur = probe_duration(out_mp4) if out_mp4.exists() else 0.0
         topics.mark_completed(topic_name, slug=slug, title=cfg.get('title', topic_name.upper()), duration=dur, slides=len(slides), video_path=out_mp4)
-        print(f"\n[Auto Pipeline] Complete! Final deliverable: {out_mp4}")
 
     elif cmd == 'topics':
         import topics
