@@ -3,20 +3,34 @@ import { resolve, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 async function main() {
-  const slug = process.argv[2] || 'sunk-cost-fallacy';
-  const projectDir = resolve('slideshow-workflow/projects', slug);
+  const arg = process.argv[2] || 'sunk-cost-fallacy';
+  let projectDir;
+  if (existsSync(arg) && existsSync(join(arg, 'film.json'))) {
+    projectDir = resolve(arg);
+  } else if (existsSync(join(process.cwd(), arg, 'film.json'))) {
+    projectDir = join(process.cwd(), arg);
+  } else {
+    projectDir = resolve('slideshow-workflow/projects', arg);
+  }
+
   const promptsFile = join(projectDir, 'prompts.json');
   const imagesDir = join(projectDir, 'images');
+  if (!existsSync(promptsFile)) {
+    console.error(`[Batch Generator] Prompts file missing at: ${promptsFile}`);
+    process.exit(1);
+  }
+
   const prompts = JSON.parse(readFileSync(promptsFile, 'utf-8'));
 
   // Import flow-mcp
   const flowUrl = pathToFileURL('C:/Users/sangw/flow-mcp/dist/flow.js').href;
   const flow = await import(flowUrl);
 
-  console.log(`[Batch Generator] Starting generation for ${prompts.length} slides...`);
+  console.log(`[Batch Generator] Starting generation for ${prompts.length} items in ${projectDir}...`);
 
   for (let i = 0; i < prompts.length; i++) {
     const s = prompts[i];
+    const aspectRatio = s.aspect_ratio || '1:1';
     const pngPath = join(imagesDir, `${s.name}.png`);
     const jpegPath = join(imagesDir, `${s.name}.jpeg`);
 
@@ -27,14 +41,13 @@ async function main() {
     }
 
     if (existsSync(pngPath)) {
-      console.log(`[${i + 1}/${prompts.length}] Slide "${s.name}" already exists. Skipping.`);
+      console.log(`[${i + 1}/${prompts.length}] "${s.name}" already exists. Skipping.`);
       continue;
     }
 
     console.log(`\n------------------------------------------------------------`);
-    console.log(`[${i + 1}/${prompts.length}] Generating slide: ${s.name}`);
-    console.log(`Trigger: "${s.trigger}"`);
-    console.log(`Title: "${s.top_title}" | Caption: "${s.bottom_caption}"`);
+    console.log(`[${i + 1}/${prompts.length}] Generating [${aspectRatio}]: ${s.name}`);
+    if (s.trigger) console.log(`Trigger: "${s.trigger}"`);
     console.log(`Prompt: ${s.prompt.slice(0, 100)}...`);
 
     const job = {
@@ -45,7 +58,7 @@ async function main() {
       createdAt: new Date().toISOString(),
       params: {
         type: 'image',
-        aspect_ratio: '1:1',
+        aspect_ratio: aspectRatio,
         prompt: s.prompt,
         output_dir: imagesDir,
         file_stem: s.name,
@@ -62,6 +75,13 @@ async function main() {
         } else if (f.endsWith('.png')) {
           copyFileSync(f, jpegPath);
         }
+      }
+      
+      // If thumbnail, also copy to project root
+      if (s.type === 'thumbnail') {
+        const thumbDest = join(projectDir, `${s.name}.png`);
+        try { copyFileSync(pngPath, thumbDest); } catch {}
+        console.log(` -> Preserved thumbnail at: ${thumbDest}`);
       }
       console.log(` -> Verified both .png and .jpeg for ${s.name}`);
     } catch (err) {
@@ -80,7 +100,7 @@ async function main() {
     }
   }
 
-  console.log(`\n[Batch Generator] Finished all slides.`);
+  console.log(`\n[Batch Generator] Finished all prompts.`);
   process.exit(0);
 }
 

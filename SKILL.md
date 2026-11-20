@@ -1,6 +1,6 @@
 ---
 name: stickman-generator
-description: Autonomous end-to-end production of stick-figure explainer slideshow videos in both 1-minute Shorts (9:16) and 10-minute Long-Form (16:9) formats, featuring synchronized voice narration, editorial webcomic styling, ducked royalty-free background music, dual-phase pacing guardrails, automatic companion short generation, and topic deduplication. Use when asked to generate, script, storyboard, render, or produce stickman explainer shorts or long-form slideshow videos.
+description: Autonomous end-to-end production of stick-figure explainer slideshow videos in both 1-minute Shorts (9:16) and 10-minute Long-Form (16:9) formats, featuring synchronized voice narration, editorial webcomic styling, ducked royalty-free background music, dual-phase pacing guardrails, automatic companion short generation, social captions with 5 hashtags, 16:9 YouTube thumbnail generation, and automatic cleanup of intermediate scratch files. Use when asked to generate, script, storyboard, render, or produce stickman explainer shorts or long-form slideshow videos.
 ---
 
 # Stickman Slideshow Explainer Generator
@@ -9,7 +9,7 @@ A streamlined, high-speed autonomous explainer video production system that sync
 
 Supports two distinct production modes:
 1. **Short Mode**: 1-minute viral vertical short (9:16, 1080x1920, 60fps).
-2. **Long-Form Mode**: 10-minute comprehensive deep dive (16:9, 1920x1080, 60fps), which **automatically generates a companion 1-minute vertical short** from the opening hook!
+2. **Long-Form Mode**: 10-minute comprehensive deep dive (16:9, 1920x1080, 60fps), which **automatically generates a companion 1-minute vertical short** from the opening hook and a matching **16:9 YouTube thumbnail**!
 
 ---
 
@@ -19,14 +19,47 @@ Activate this skill when:
 - Asked to **"generate a clip"**, **"create an explainer short"**, **"make a 10 min video"**, or **"make a video on [Topic]"**.
 - Producing timed visual slideshow explainers on psychology, cognitive biases, paradoxes, productivity laws, or human behavior.
 - Generating editorial webcomic stick-figure artwork via Google Flow (`flow_agent_images`).
-- Synchronizing slide transitions strictly to speech audio word clocks via Whisper.
-- Enforcing retention pacing guardrails.
+- Generating social media captions with exactly 5 targeted hashtags.
+- Generating 16:9 YouTube thumbnails in the editorial stick-figure comic art style.
+- Automatically cleaning up intermediate scratch files so only final deliverables remain in the execution directory.
 
 ---
 
 ## ⚡ Core Operating Guardrails
 
-### 1. Pacing Guardrails (By Mode)
+### 1. Working Directory & Automatic Scratch Cleanup
+- **Save Location**: The directory where the agent is run is the exact directory where all project files and deliverables are created.
+- **Automatic Post-Production Cleanup**: After video rendering, all intermediate scratch files and folders (`build/`, `voice/`, `images/`, `out_frames/`, temporary audio WAVs) are **automatically deleted**.
+- **Preserved Deliverables**:
+  1. Primary Video (`<slug>.mp4` or `<slug>-long.mp4`)
+  2. Companion Short for long-form (`<slug>-short.mp4`)
+  3. 16:9 YouTube Thumbnail for long-form (`<slug>-thumbnail.png`)
+  4. Social Media Caption + 5 Hashtags (`<slug>-caption.txt`)
+  5. Metadata Record (`<slug>-metadata.json`)
+  6. Updated Topic Ledger (`topics/completed_topics.json`)
+
+---
+
+### 2. Social Captions & Exactly 5 Hashtags
+Every completed video automatically generates:
+- **Engaging Caption**: Hooky, curiosity-driven summary of the psychological paradox/concept with a conversational question prompt.
+- **Exactly 5 Hashtags**: 5 high-impact, topic-relevant hashtags (e.g. `#{Topic} #Psychology #HumanBehavior #Mindset #LifeHacks`).
+- Saved directly to `<slug>-caption.txt` and `<slug>-metadata.json`.
+
+---
+
+### 3. YouTube Thumbnail for Long-Form Videos
+When generating a 10-minute long-form video (16:9):
+- A dedicated **16:9 widescreen thumbnail** is generated in the **exact same editorial stick-figure webcomic art style**.
+- **Topic Name**: Prominently displayed in huge, bold black comic typography across the top center.
+- **Focal Character**: Oversized round white head, shocked/wide dot eyes, wearing a bold solid primary red shirt (`#DC2626`).
+- **Dramatic Visual Metaphor**: High-contrast, clickable visual scene representing the concept (e.g. throwing bags of cash into a burning incinerator, standing at a cliff edge, or looking at a giant ticking trap).
+- **Canvas**: Clean warm parchment cream (`#FBF6EF`), flat 2D coloring, soft gray ground shadow, 16:9 aspect ratio.
+- Saved as `<slug>-thumbnail.png`.
+
+---
+
+### 4. Pacing Guardrails (By Mode)
 
 #### A. Short Mode (~60–80 Seconds)
 - **Duration**: 2.0s to 4.0s per slide (average ~2.5–3.5s).
@@ -47,40 +80,29 @@ Activate this skill when:
 
 ---
 
-### 2. Resolution & Aspect Ratios
+### 5. Resolution & Aspect Ratios
 
 | Mode | Video Dimensions | Flow Image Prompt Aspect Ratio | Canvas Layout |
 |---|---|---|---|
 | **Short** | 1080x1920 (9:16 Vertical) | `1:1` Square (`1080x1080`) | Centered square canvas with clean letterbox |
 | **Long-Form** | 1920x1080 (16:9 Horizontal) | `16:9` Landscape (`1920x1080`) | Full bleed widescreen canvas (`#FBF6EF`) |
+| **Thumbnail** | 1920x1080 (16:9 Horizontal) | `16:9` Landscape (`1920x1080`) | High-contrast YouTube thumbnail with bold title |
 
 ---
 
-### 3. Visual DNA (Editorial Webcomic Style)
+### 6. Visual DNA (Editorial Webcomic Style)
 - **Head**: Oversized smooth white circle with dot eyes, minimal eyebrows, and expressive mouths.
-- **Torso**: Bean/pear-shaped torso wearing plain white or a bold solid primary shirt:
-  - **Red**: Urgent, driven, aggressive, results-focused (`#DC2626`).
-  - **Yellow**: Enthusiastic, chaotic, spontaneous, energetic (`#EAB308`).
-  - **Green**: Calm, passive, conflict-avoidant, patient (`#16A34A`).
-  - **Blue**: Analytical, meticulous, methodical, fact-driven (`#2563EB`).
+- **Torso**: Bean/pear-shaped torso wearing plain white or a bold solid primary shirt (Red, Yellow, Green, Blue).
 - **Limbs**: Thin, uniform black stick limbs with small oval white hands and shoes.
 - **Canvas**: Warm off-white parchment cream background (`#FBF6EF` / `#F6F4EC`).
 - **Layout**: Centered action with clean top zone (for headline title) and bottom zone (for captions). No bare pencil sketches; always crisp ink outlines, flat 2D cel colors, and soft gray ground shadows.
 
 ---
 
-### 4. Audio Mastering & Ducking
+### 7. Dual Audio Engine & Ducking
 - Spoken narration mastered to **-14.0 LUFS** integrated loudness.
 - Background music auto-selected from `audio/music/` and ducked to **-26.0 dB** behind voice.
 - Ambient bed seamlessly loops across any duration (from 1 minute to 10+ minutes).
-
----
-
-### 5. Automatic Companion Short Generation
-When producing a **10-minute long-form video**, the pipeline **automatically extracts and renders an autonomous 1-minute vertical 9:16 Short** from the opening hook.
-- Delivered simultaneously in `projects/<slug>/out/`:
-  - `<slug>-long.mp4` (1920x1080, 16:9 widescreen, ~10m)
-  - `<slug>-short.mp4` (1080x1920, 9:16 vertical short, ~1m)
 
 ---
 
@@ -111,24 +133,23 @@ python tools/cli.py new my-short --mode short
 # Initialize a 10-minute Long-Form video (16:9 widescreen)
 python tools/cli.py new my-deepdive --mode long
 
-# Compile prompts for Google Flow (1:1 for short, 16:9 for long)
+# Compile prompts (1:1 for short, 16:9 + thumbnail for long)
 python tools/cli.py prompts <slug>
 
 # Generate TTS voiceover and Whisper word timestamps
 python tools/cli.py tts <slug> --voice Charon
 
-# Mix ducked background music with voice
-python tools/cli.py mix <slug>
+# Generate/view caption + 5 hashtags
+python tools/cli.py caption <slug>
 
-# Validate timing & pacing rules (enforces 4s rule in first 2 mins, 6s thereafter)
+# Validate timing & pacing rules
 python tools/cli.py check <slug>
 
-# Manually extract companion short from a long-form project
-python tools/cli.py extract-short <slug>
-
 # 1-Command Autonomous Production
-# - For short: produces out/<slug>.mp4
-# - For long: produces out/<slug>-long.mp4 AND out/<slug>-short.mp4 automatically!
+# - Generates primary video + companion short (if long) + thumbnail (if long)
+# - Generates social caption + 5 hashtags
+# - Cleans up all intermediate scratch files automatically
+# - Updates topics/completed_topics.json
 python tools/cli.py auto <slug>
 ```
 
@@ -137,15 +158,18 @@ python tools/cli.py auto <slug>
 ## 🚀 Autonomous Production Protocol
 
 When the user asks for a video:
-1. **Determine Mode**:
-   - If user asks for a "clip", "short", or "reels" -> use **Short Mode** (`--mode short`).
-   - If user asks for a "10 min video", "long video", or "deep dive" -> use **Long-Form Mode** (`--mode long`).
+1. **Determine Mode & Directory**:
+   - Short Mode (`--mode short`) vs Long-Form Mode (`--mode long`).
+   - Run in the current working directory where the user executes the agent.
 2. **Fetch Topic**: Run `python tools/cli.py topics next` and confirm it is uncompleted.
 3. **Draft Script**:
    - For Short: Use `prompts/script_prompt.md`.
    - For Long-Form: Use `prompts/script_long_prompt.md`.
 4. **Storyboard**:
    - For Short: 25–30 slides (`prompts/storyboard_prompt.md`), all `<= 4.0s`.
-   - For Long-Form: 115–140 slides (`prompts/storyboard_long_prompt.md`), `<= 4.0s` in first 2 mins, `<= 6.0s` after 2 mins. Tag opening ~20–25 slides with `"short_candidate": true`.
-5. **Run Auto Pipeline**: Run `python tools/cli.py auto <slug>`.
-6. **Deliver**: Provide direct links to the generated MP4 deliverables.
+   - For Long-Form: 115–140 slides (`prompts/storyboard_long_prompt.md`), `<= 4.0s` in first 2 mins, `<= 6.0s` after 2 mins.
+5. **Execute Auto Pipeline**: Run `python tools/cli.py auto <slug>`.
+   - Produces video(s), caption + 5 hashtags, and thumbnail (for long).
+   - Automatically purges scratch folders (`build/`, `voice/`, `images/`).
+   - Updates `topics/completed_topics.json`.
+6. **Deliver**: Present clickable links to the finished MP4(s), thumbnail image, and caption text.

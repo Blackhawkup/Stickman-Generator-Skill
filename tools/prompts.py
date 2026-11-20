@@ -1,5 +1,6 @@
 """Compiles slides.json into Flow MCP prompts using customizable prompt templates.
-Supports 1:1 square canvas for Shorts and 16:9 widescreen canvas for 10-minute Long-Form videos.
+Supports 1:1 square canvas for Shorts, 16:9 widescreen canvas for 10-minute Long-Form videos,
+and generates a dedicated high-CTR YouTube thumbnail prompt in the same art style for Long-Form.
 """
 from pathlib import Path
 from common import load_json, save_json, PROMPTS_DIR, die
@@ -28,7 +29,6 @@ def build_prompts(project_dir):
         
         # Build Flow prompt tailored for format
         if is_long:
-            # 16:9 Widescreen Landscape formula
             prompt_parts = [
                 f"Modern 2D editorial webcomic explainer illustration on a warm off-white cream background ({bg_color}).",
                 "16:9 widescreen landscape canvas, wide cinematic framing."
@@ -43,7 +43,6 @@ def build_prompts(project_dir):
             )
             aspect_ratio = "16:9"
         else:
-            # 1:1 Square canvas formula for Shorts
             prompt_parts = [
                 f"Modern 2D editorial webcomic explainer illustration on a warm off-white cream background ({bg_color}).",
                 "1:1 square canvas."
@@ -71,6 +70,26 @@ def build_prompts(project_dir):
             'short_candidate': s.get('short_candidate', False)
         })
         
+    # If Long-Form: generate a dedicated YouTube Thumbnail prompt in the same art style
+    if is_long:
+        thumb_name = f"{pdir.name}-thumbnail"
+        thumb_prompt = (
+            f"Modern 2D editorial webcomic explainer illustration on a warm off-white cream background ({bg_color}). "
+            f"16:9 widescreen landscape YouTube thumbnail. In huge bold comic typography across the top center: \"{project_title}\". "
+            f"In the center: Dramatic high-contrast visual scene. Stylized stick-figure character with oversized round white head, shocked wide dot eyes and open mouth, wearing a bright solid crimson red shirt (#DC2626), frozen in disbelief facing a giant dilemma or metaphorical paradox. "
+            f"Thick uniform black ink outlines, flat 2D coloring with zero gradients, soft gray ground shadow, clean negative space, dramatic YouTube thumbnail composition, clickable, 16:9 landscape aspect ratio."
+        )
+        out_prompts.append({
+            'name': thumb_name,
+            'type': 'thumbnail',
+            'top_title': project_title,
+            'bottom_caption': 'WHY WE CANT LET GO',
+            'prompt': thumb_prompt,
+            'caption': 'THUMBNAIL',
+            'aspect_ratio': '16:9'
+        })
+        print(f" -> Added 16:9 YouTube Thumbnail prompt: '{thumb_name}'")
+
     save_json(pdir / 'prompts.json', out_prompts)
     format_label = "16:9 Widescreen (Long-Form)" if is_long else "1:1 Square (Short)"
     print(f"\n[Prompts] Generated {len(out_prompts)} prompts [{format_label}] -> {pdir / 'prompts.json'}")
@@ -78,5 +97,5 @@ def build_prompts(project_dir):
     for p in out_prompts[:5]:
         print(f" - [{p['name']}]: {p['prompt'][:90]}...")
     if len(out_prompts) > 5:
-        print(f"   ... and {len(out_prompts) - 5} more slide prompts.")
+        print(f"   ... and {len(out_prompts) - 5} more prompts.")
     return out_prompts
