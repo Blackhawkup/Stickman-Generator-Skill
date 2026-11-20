@@ -1,0 +1,98 @@
+[
+  {
+    "topic": "The Pratfall Effect",
+    "slug": "pratfall-effect",
+    "category": "Social Psychology",
+    "hook_scenario": "A brilliant, flawless presenter spills coffee all over his shirt, and suddenly everyone in the room likes him twice as much.",
+    "core_concept": "Competent people become significantly more likable and relatable when they make a small, clumsy mistake.",
+    "researcher": "Elliot Aronson (1966)"
+  },
+  {
+    "topic": "The Spotlight Effect",
+    "slug": "spotlight-effect",
+    "category": "Cognitive Bias",
+    "hook_scenario": "You walk into an office wearing a stained shirt convinced everyone is staring at you, but almost nobody even noticed.",
+    "core_concept": "We intuitively overestimate how much other people notice our flaws, appearance, and awkward moments.",
+    "researcher": "Thomas Gilovich (2000)"
+  },
+  {
+    "topic": "The Dunning-Kruger Effect",
+    "slug": "dunning-kruger-effect",
+    "category": "Cognitive Psychology",
+    "hook_scenario": "Someone who watched a single 10-minute tutorial argues passionately with an expert who has practiced for fifteen years.",
+    "core_concept": "People with low knowledge in a domain severely overestimate their competence, while genuine experts tend to doubt themselves.",
+    "researcher": "David Dunning and Justin Kruger (1999)"
+  },
+  {
+    "topic": "Parkinson's Law",
+    "slug": "parkinsons-law",
+    "category": "Productivity & Behavior",
+    "hook_scenario": "Give someone two months to complete a simple presentation and it takes exactly two months; give them two days and it gets done in two days.",
+    "core_concept": "Work automatically expands to fill the exact time allocated for its completion.",
+    "researcher": "Cyril Northcote Parkinson (1955)"
+  },
+  {
+    "topic": "The Pygmalion Effect",
+    "slug": "pygmalion-effect",
+    "category": "Educational Psychology",
+    "hook_scenario": "A teacher is falsely told that five random students are secret geniuses; by the end of the semester, those five students test higher than everyone else.",
+    "core_concept": "Higher expectations placed on people lead directly to an increase in their actual performance.",
+    "researcher": "Robert Rosenthal and Lenore Jacobson (1968)"
+  },
+  {
+    "topic": "The Peak-End Rule",
+    "slug": "peak-end-rule",
+    "category": "Memory & Experience",
+    "hook_scenario": "A vacation filled with delayed flights and rainy days is remembered fondly forever simply because of an incredible dinner on the final night.",
+    "core_concept": "Humans judge past experiences based almost entirely on the emotional peak and how the experience ended, ignoring duration.",
+    "researcher": "Daniel Kahneman (1993)"
+  },
+  {
+    "topic": "The Zeigarnik Effect",
+    "slug": "zeigarnik-effect",
+    "category": "Cognitive Psychology",
+    "hook_scenario": "A waiter remembers complex unpaid diner orders perfectly from memory, but completely forgets them seconds after the bill is paid.",
+    "core_concept": "Our brains keep uncompleted or interrupted tasks top of mind while discarding finished ones.",
+    "researcher": "Bluma Zeigarnik (1927)"
+  },
+  {
+    "topic": "The Cobra Effect",
+    "slug": "cobra-effect",
+    "category": "Unintended Consequences",
+    "hook_scenario": "The government offers a cash reward for every dead cobra turned in to eliminate pests; instead, citizens begin breeding cobras for income.",
+    "core_concept": "Incentives designed to solve a problem often unintentionally worsen the exact problem they aimed to fix.",
+    "researcher": "Horst Siebert"
+  },
+  {
+    "topic": "The Paradox of Choice",
+    "slug": "paradox-of-choice",
+    "category": "Decision Science",
+    "hook_scenario": "A supermarket table offering 24 jam flavors attracts huge crowds but almost no sales, while a table with just 6 flavors sells out instantly.",
+    "core_concept": "Having too many options increases decision fatigue, paralysis, and post-purchase regret.",
+    "researcher": "Barry Schwartz (2004)"
+  },
+  {
+    "topic": "The Decoy Effect",
+    "slug": "decoy-effect",
+    "category": "Consumer Behavior",
+    "hook_scenario": "Nobody buys a medium popcorn until the cinema prices it at $6.50 next to a large for $7.00, making the large seem like a steal.",
+    "core_concept": "Introducing an asymmetrically dominated third option changes customer preference between the original two options.",
+    "researcher": "Joel Huber and John Payne (1982)"
+  },
+  {
+    "topic": "The Abilene Paradox",
+    "slug": "abilene-paradox",
+    "category": "Group Dynamics",
+    "hook_scenario": "A family drives four hours through dust and heat to eat at a bad cafeteria in Abilene, only to discover afterwards that none of them wanted to go.",
+    "core_concept": "A group collectively decides on a course of action that no individual member truly wanted, because each member wrongly assumed everyone else did.",
+    "researcher": "Jerry B. Harvey (1974)"
+  },
+  {
+    "topic": "Survivorship Bias",
+    "slug": "survivorship-bias",
+    "category": "Statistical Reasoning",
+    "hook_scenario": "Engineers reinforce armor where returning bombers have bullet holes, until a mathematician points out the fallen planes were hit where returning planes have no holes.",
+    "core_concept": "Focusing only on the successful survivors causes severe misjudgment by ignoring the unseen failures.",
+    "researcher": "Abraham Wald (1943)"
+  }
+]

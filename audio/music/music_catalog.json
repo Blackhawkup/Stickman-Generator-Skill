@@ -1,0 +1,82 @@
+[
+  {
+    "id": "curious",
+    "name": "Curious & Scheming",
+    "file": "slideshow-workflow/audio/music/curious.mp3",
+    "mood": "curious",
+    "description": "Mischievous pizzicato strings and clock-like rhythm. Perfect for paradoxes, behavioral quirks, and cognitive biases.",
+    "recommended_db": -26
+  },
+  {
+    "id": "investigation",
+    "name": "Investigation",
+    "file": "slideshow-workflow/audio/music/investigation.mp3",
+    "mood": "investigation",
+    "description": "Vibraphone and upright bass detective groove. Ideal for dissecting psychological studies and scientific evidence.",
+    "recommended_db": -26
+  },
+  {
+    "id": "mystery",
+    "name": "Hidden Mystery",
+    "file": "slideshow-workflow/audio/music/mystery.mp3",
+    "mood": "mystery",
+    "description": "Tense, subtle mystery with rhythmic percussion. Great for revealing unexpected human behavior and plot twists.",
+    "recommended_db": -26
+  },
+  {
+    "id": "sneaky",
+    "name": "Sneaky Tip-Toe",
+    "file": "slideshow-workflow/audio/music/sneaky.mp3",
+    "mood": "sneaky",
+    "description": "Playful bassoon and clarinet tip-toe tempo. Ideal for relatable everyday mistakes and funny irrational habits.",
+    "recommended_db": -26
+  },
+  {
+    "id": "playful",
+    "name": "Playful Comedy",
+    "file": "slideshow-workflow/audio/music/playful.mp3",
+    "mood": "playful",
+    "description": "Lighthearted bouncy cartoon rhythm. Excellent for awkward interpersonal situations and humorous stories.",
+    "recommended_db": -27
+  },
+  {
+    "id": "quirky",
+    "name": "Quirky Dog",
+    "file": "slideshow-workflow/audio/music/quirky.mp3",
+    "mood": "quirky",
+    "description": "Energetic, off-beat acoustic rhythm with whistling. Great for fun character interactions.",
+    "recommended_db": -27
+  },
+  {
+    "id": "upbeat",
+    "name": "Carefree & Warm",
+    "file": "slideshow-workflow/audio/music/upbeat.mp3",
+    "mood": "upbeat",
+    "description": "Warm, cheerful acoustic guitar and bells. Best for hopeful conclusions, actionable advice, and positive takeaways.",
+    "recommended_db": -25
+  },
+  {
+    "id": "reflective",
+    "name": "Opportunity Walk",
+    "file": "slideshow-workflow/audio/music/reflective.mp3",
+    "mood": "reflective",
+    "description": "Smooth, calm walking tempo with Rhodes piano. Ideal for philosophical reflections and life takeaways.",
+    "recommended_db": -26
+  },
+  {
+    "id": "deep_mystery",
+    "name": "Comfortable Mystery",
+    "file": "slideshow-workflow/audio/music/deep_mystery.mp3",
+    "mood": "deep_mystery",
+    "description": "Low-key noir detective jazz bass. Fits deep unresolved questions and psychological paradoxes.",
+    "recommended_db": -26
+  },
+  {
+    "id": "thoughtful",
+    "name": "The Thoughtful Builder",
+    "file": "slideshow-workflow/audio/music/thoughtful.mp3",
+    "mood": "thoughtful",
+    "description": "Steady, productive acoustic tempo. Ideal for step-by-step logic, frameworks, and decision trees.",
+    "recommended_db": -26
+  }
+]

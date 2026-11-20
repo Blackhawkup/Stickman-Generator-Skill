@@ -1,0 +1,40 @@
+{
+  "slug": "sunk-cost-fallacy",
+  "title": "THE SUNK COST FALLACY",
+  "format": "9:16",
+  "language": "en",
+  "theme": {
+    "background": "#000000",
+    "canvas_bg": "#FBF6EF",
+    "accent": "#DC2626",
+    "text_color": "#000000",
+    "font_family": "'Comic Sans MS', 'Comic Neue', cursive, sans-serif"
+  },
+  "canvas": {
+    "aspect_ratio": "1:1",
+    "width": 1080,
+    "height": 1080,
+    "canvas_bg": "#FBF6EF",
+    "border_radius": 0,
+    "shadow": false,
+    "blur_backdrop": false
+  },
+  "style_preset": "editorial_stick_comic",
+  "voice": {
+    "engine": "gemini",
+    "name": "Charon",
+    "style": "curious, punchy, engaging psychological explainer voice"
+  },
+  "transitions": {
+    "default_type": "cut",
+    "fade_duration": 0.0,
+    "ken_burns_zoom": 1.0
+  },
+  "music": "curious",
+  "music_db": -26,
+  "pacing": {
+    "lead": 0.5,
+    "tail": 1.5,
+    "pauses": []
+  }
+}

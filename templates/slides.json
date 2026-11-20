@@ -1,0 +1,51 @@
+[
+  {
+    "name": "slide_01_breakdown",
+    "trigger": "car just broke down",
+    "subject": "A modern compact electric car broken down on a scenic suburban roadside with a slight puff of steam from under the front hood",
+    "caption": "THE BREAKDOWN",
+    "transition": "fade"
+  },
+  {
+    "name": "slide_02_chatbot_list",
+    "trigger": "ask a chatbot",
+    "subject": "A glowing smartphone displaying a chat message interface showing a bulleted checklist of tasks",
+    "caption": "CHATBOT ADVICE",
+    "transition": "fade"
+  },
+  {
+    "name": "slide_03_stress_todo",
+    "trigger": "do all of it",
+    "subject": "A frustrated person sitting at a desk surrounded by endless floating checkboxes and calendar reminders",
+    "caption": "ALL ON YOU",
+    "transition": "fade"
+  },
+  {
+    "name": "slide_04_ai_agent",
+    "trigger": "ask an AI agent",
+    "subject": "An autonomous AI digital assistant represented as an elegant glowing node orchestrating multiple tasks simultaneously",
+    "caption": "ENTER THE AGENT",
+    "transition": "fade"
+  },
+  {
+    "name": "slide_05_automated_hub",
+    "trigger": "calls the garage",
+    "subject": "A sleek digital dashboard showing automated phone calls, repair bookings, taxi reservations, and calendar events confirming automatically with green checkmarks",
+    "caption": "FULLY AUTOMATED",
+    "transition": "fade"
+  },
+  {
+    "name": "slide_06_relax_home",
+    "trigger": "just go home",
+    "subject": "A completely relaxed person comfortably enjoying coffee on a sofa at home while autonomous devices handle everything in the background",
+    "caption": "PEACE OF MIND",
+    "transition": "fade"
+  },
+  {
+    "name": "slide_07_payoff",
+    "trigger": "does it for you",
+    "subject": "Bold inspiring comparison infographic visually contrasting passive chatbots with proactive autonomous AI agents",
+    "caption": "TELLS VS DOES",
+    "transition": "fade"
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "topic": "The Sunk Cost Fallacy",
+    "slug": "sunk-cost-fallacy",
+    "title": "THE SUNK COST FALLACY",
+    "completed_at": "2026-11-20T21:26:00Z",
+    "duration_seconds": 80.85,
+    "slides_count": 30,
+    "video_path": "slideshow-workflow/examples/sunk-cost-fallacy-example.mp4",
+    "interactive_player": "slideshow-workflow/examples/sunk-cost-fallacy/build/page.html",
+    "status": "completed"
+  }
+]

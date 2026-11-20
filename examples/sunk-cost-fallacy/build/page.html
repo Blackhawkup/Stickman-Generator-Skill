@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>THE SUNK COST FALLACY</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      background: #000000;
+      font-family: 'Comic Sans MS', 'Comic Neue', cursive, sans-serif;
+      user-select: none;
+    }
+    #viewport {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      background: #000000;
+    }
+    #slides-container {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="viewport">
+    <div id="slides-container"></div>
+    <audio id="narration-audio" src="../voice/mix.wav" preload="auto"></audio>
+  </div>
+
+  <script src="clocks.js"></script>
+  <script src="film.js"></script>
+  <script src="slides.js"></script>
+  <script src="slideshow.js"></script>
+</body>
+</html>

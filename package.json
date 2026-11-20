@@ -1,0 +1,13 @@
+﻿{
+  "name": "stickman-generator-skill",
+  "version": "1.0.0",
+  "description": "Production skill for 1-minute stick-figure explainer slideshow videos with synchronized voiceover",
+  "main": "engine/slideshow.js",
+  "scripts": {
+    "check": "python tools/cli.py check",
+    "render": "python tools/cli.py render",
+    "auto": "python tools/cli.py auto"
+  },
+  "author": "Blackhawkup",
+  "license": "MIT"
+}
