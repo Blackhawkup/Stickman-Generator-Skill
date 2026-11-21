@@ -8,7 +8,10 @@
   const H = FILM.H || 1600;
   const FORMAT = FILM.format || '720:1600';
   const CANVAS_CFG = FILM.canvas || {};
-  const CANVAS_BG = CANVAS_CFG.canvas_bg || '#FBF6EF';
+  let CANVAS_BG = CANVAS_CFG.canvas_bg || (FILM.theme && FILM.theme.canvas_bg) || (FILM.theme && FILM.theme.background) || '#FBF6EF';
+  if (CANVAS_BG === '#000000' || CANVAS_BG === '#000' || CANVAS_BG.toLowerCase() === 'black') {
+    CANVAS_BG = '#FBF6EF';
+  }
   
   const FADE_DUR = (FILM.transitions && FILM.transitions.fade_duration != null) ? FILM.transitions.fade_duration : 0.0;
   const KEN_BURNS = (FILM.transitions && FILM.transitions.ken_burns_zoom != null) ? FILM.transitions.ken_burns_zoom : 1.0;

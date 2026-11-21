@@ -80,6 +80,62 @@ def measure_lufs(path):
     return float(re.findall(r'I:\s+(-?[\d.]+) LUFS', r.stderr)[-1])
 
 
+def auto_select_music(pdir, topic_str=""):
+    """Selects an ambient music track dynamically from the 12 curated tracks:
+    curious, investigation, mystery, sneaky, playful, quirky, upbeat, reflective, deep_mystery, thoughtful, light, comedy.
+    Avoids recently used tracks in completed_topics.json and matches topic mood.
+    """
+    catalog_path = Path(__file__).resolve().parent.parent / 'audio' / 'music' / 'music_catalog.json'
+    catalog = load_json(catalog_path) if catalog_path.exists() else []
+    all_tracks = [t['id'] for t in catalog] if catalog else [
+        'curious', 'investigation', 'mystery', 'sneaky', 'playful', 'quirky',
+        'upbeat', 'reflective', 'deep_mystery', 'thoughtful', 'light', 'comedy'
+    ]
+    
+    # Check completed topics for recently used tracks
+    topics_file = Path(__file__).resolve().parent.parent / 'topics' / 'completed_topics.json'
+    completed = load_json(topics_file) if topics_file.exists() else []
+    recent_tracks = [x.get('music') for x in completed[-4:] if x.get('music')]
+    
+    # Analyze topic/script keywords for mood
+    search_text = (topic_str or "").lower()
+    pdir = Path(pdir)
+    if not search_text:
+        film_file = pdir / 'film.json'
+        if film_file.exists():
+            cfg = load_json(film_file)
+            search_text = (cfg.get('topic') or cfg.get('title') or cfg.get('slug') or '').lower()
+        script_file = pdir / 'script.md'
+        if script_file.exists():
+            search_text += " " + script_file.read_text(encoding='utf-8')[:300].lower()
+            
+    # Mood candidate mappings
+    candidates = []
+    if any(k in search_text for k in ('bias', 'fallacy', 'paradox', 'trick', 'irrational', 'brain', 'illusion', 'sunk cost', 'spotlight')):
+        candidates = ['curious', 'sneaky', 'quirky', 'thoughtful']
+    elif any(k in search_text for k in ('study', 'experiment', 'research', 'evidence', 'scientist', 'test', 'data', 'laboratory')):
+        candidates = ['investigation', 'thoughtful', 'deep_mystery']
+    elif any(k in search_text for k in ('mystery', 'secret', 'hidden', 'dark', 'unexplained', 'bizarre', 'strange')):
+        candidates = ['mystery', 'deep_mystery', 'investigation']
+    elif any(k in search_text for k in ('funny', 'humor', 'embarrass', 'clumsy', 'mistake', 'awkward', 'spill', 'pratfall', 'laugh', 'coffee')):
+        candidates = ['playful', 'comedy', 'quirky', 'sneaky']
+    elif any(k in search_text for k in ('growth', 'lesson', 'decision', 'mindset', 'life', 'habit', 'relationship', 'future', 'success')):
+        candidates = ['reflective', 'upbeat', 'light', 'thoughtful']
+    else:
+        candidates = ['curious', 'thoughtful', 'reflective', 'investigation', 'playful', 'quirky']
+        
+    # Filter out recent tracks to ensure dynamic rotation
+    fresh_candidates = [c for c in candidates if c not in recent_tracks and c in all_tracks]
+    if fresh_candidates:
+        chosen = fresh_candidates[0]
+    else:
+        fresh_all = [t for t in all_tracks if t not in recent_tracks]
+        chosen = fresh_all[0] if fresh_all else candidates[0]
+        
+    print(f"[Music] Dynamic auto-selected soundtrack track: '{chosen}' (matching mood, avoiding recent repeats: {recent_tracks})")
+    return chosen
+
+
 def resolve_music_path(music_spec):
     if not music_spec or music_spec == 'none':
         return None
@@ -110,7 +166,13 @@ def mix_audio(pdir, target_lufs=-14.0):
     out[:, 0] += vo
     out[:, 1] += vo
     
-    music_spec = cfg.get('music', 'curious')
+    music_spec = cfg.get('music', 'auto')
+    if music_spec in ('auto', 'dynamic', None, ''):
+        chosen_track = auto_select_music(pdir)
+        cfg['music'] = chosen_track
+        save_json(pdir / 'film.json', cfg)
+        music_spec = chosen_track
+        
     m_target = resolve_music_path(music_spec)
     
     if m_target:

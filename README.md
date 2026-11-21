@@ -11,11 +11,18 @@ Designed to run in any directory, generating finished deliverables (videos, soci
 - **⚡ Dual Video Formats**:
   - **Phone / Short / Reel (720 x 1600)**: Centered artwork with matching warm cream (`#FBF6EF`) background fill. Zero black bars.
   - **Laptop / Long-Form (1920 x 1080)**: 16:9 widescreen cinematic framing with rich 2D environmental details.
-- **⏱️ High-Retention 1st Minute Pacing**:
-  - In the 1st minute (both short and long), every image stays on screen for **less than 3 seconds** (`< 3.0s`), averaging **~2.0 seconds** (~30 slides per minute).
-  - In long-form after 2 minutes, slides are allowed to stay on screen for **5.0 to 6.0 seconds** for deep exposition.
+- **🚨 Mandatory Hook Formula**:
+  - **Sentence 1**: Uppercase Topic Title (e.g., `THE PRATFALL EFFECT.`).
+  - **Sentence 2**: MUST start with `"Imagine a guy..."`, `"Imagine you..."`, or `"Imagine if you..."`.
+  - **Negative Constraint**: Zero named fictional characters (banned: *"Leo walked into the office..."*).
+- **⏱️ High-Retention Pacing (Mostly 3s, Sometimes 2s)**:
+  - Slides stay on screen for mostly **~3.0 seconds**, dipping to **~2.0 seconds** for fast surprise beats or punchlines (target average ~2.8s–3.2s).
+  - In long-form after 2 minutes, slides stay on screen for **5.0 to 6.0 seconds** for deep exposition.
+- **🎵 Dynamic Background Music Rotation (12 Tracks)**:
+  - Curated library of 12 royalty-free instrumental tracks in `audio/music/` (`curious`, `investigation`, `mystery`, `sneaky`, `playful`, `quirky`, `upbeat`, `reflective`, `deep_mystery`, `thoughtful`, `light`, `comedy`).
+  - Automatically matches topic mood and rotates tracks using `topics/completed_topics.json` history to prevent back-to-back repeats.
 - **🎨 Rich 2D Background Details**:
-  - In addition to the signature stick figures, backgrounds feature stylized, charming 2D environmental elements: mid-century bookshelves, framed wall art, modern potted plants, stylish floor lamps, cozy desks, office whiteboards, and subtle city skylines in fine ink lines with muted earthy neutrals.
+  - Backgrounds feature stylized, charming 2D environmental elements: mid-century bookshelves, framed wall art, modern potted plants, stylish floor lamps, cozy desks, office whiteboards, and subtle city skylines in fine ink lines with muted earthy neutrals.
 - **🖼️ 1920x1080 YouTube Thumbnail**: Automatically generates a high-CTR, dramatic widescreen thumbnail featuring the topic name in the exact same editorial stick-figure webcomic art style.
 - **🎁 Automatic Companion Short**: Producing a 10-minute long-form video automatically renders an accompanying 720x1600 Short (`out/<slug>-short.mp4`) from the opening hook.
 - **📝 Social Captions + Exactly 5 Hashtags**: Every generated video automatically produces an engaging caption accompanied by exactly 5 targeted hashtags (`<slug>-caption.txt`).
@@ -34,9 +41,9 @@ Stickman-Generator-Skill/
 ├── package.json                      # Node metadata & scripts
 ├── prompts/                          # User-editable prompts & styling
 │   ├── topic_prompt.md               # Topic discovery & psychological angle
-│   ├── script_prompt.md              # 1-minute short script formula
+│   ├── script_prompt.md              # 1-minute short script formula (Mandatory Imagine hook)
 │   ├── script_long_prompt.md         # 10-minute long-form script formula (7 acts)
-│   ├── storyboard_prompt.md          # Short slide breakdown (< 3s pacing, ~2s avg)
+│   ├── storyboard_prompt.md          # Short slide breakdown (mostly ~3s, sometimes ~2s)
 │   ├── storyboard_long_prompt.md     # Long slide breakdown (~130 slides, multi-phase pacing)
 │   ├── image_prompt_template.md      # Flow prompt formula (720x1600 & 1920x1080)
 │   └── style_presets.json            # Style presets with rich 2D background details
@@ -46,26 +53,26 @@ Stickman-Generator-Skill/
 │   ├── cli.py                        # Unified command-line interface
 │   ├── metadata.py                   # Caption + 5 hashtags generator
 │   ├── cleanup.py                    # Automatic scratch file cleanup utility
-│   ├── check.py                      # Pacing validation (< 3s in 1st min, ~2s avg)
+│   ├── check.py                      # Pacing validation (mostly ~3s, sometimes ~2s)
 │   ├── extract_short.py              # Automatic companion short generator (720x1600)
 │   ├── prompts.py                    # Slide prompt compiler (1920x1080, 720x1600 & thumbnail)
 │   ├── voice.py                      # TTS generator & Whisper word-clock alignment
-│   ├── mix.py                        # Audio ducking (-26dB) & LUFS mastering
-│   ├── build.py                      # HTML web player generator
+│   ├── mix.py                        # Dynamic music rotation across 12 tracks & ducking (-26dB)
+│   ├── build.py                      # HTML web player generator (full cream fill, no black bars)
 │   ├── render.py                     # Parallel Playwright frame capturer + FFmpeg
 │   └── topics.py                     # Topic queue & deduplication manager
 ├── topics/
 │   ├── example_topics.json           # Queue of viral ideas waiting to be made
-│   ├── completed_topics.json         # Permanent ledger of finished videos
+│   ├── completed_topics.json         # Permanent ledger of finished videos & tracks used
 │   └── README.md                     # Topic management guide
 ├── audio/
-│   └── music/                        # Curated royalty-free music library
+│   └── music/                        # Curated royalty-free music library (12 tracks)
 │       ├── music_catalog.json        # Mood tags & track definitions
 │       └── *.mp3                     # Instrumental audio tracks
 ├── templates/
 │   └── film.json                     # Project manifest template
 └── examples/                         # Verified reference outputs
-    └── sunk-cost-fallacy/            # Canonical 30-slide 60fps project
+    └── sunk-cost-fallacy/            # Canonical project reference
 ```
 
 ---
@@ -100,28 +107,41 @@ python tools/cli.py new my-short --mode short
 # 2. Create a Laptop Long-Form project (1920x1080)
 python tools/cli.py new my-deepdive --mode long
 
-# 3. Generate speech audio & Whisper word timestamps
-python tools/cli.py tts my-deepdive --voice Charon
+# 3. Compile prompts (16:9 + thumbnail for long, centered for phone)
+python tools/cli.py prompts <slug>
 
-# 4. Compile prompts (1920x1080 + thumbnail for long, 720x1600 for short)
-python tools/cli.py prompts my-deepdive
+# 4. Generate TTS voiceover and Whisper word timestamps
+python tools/cli.py tts <slug> --voice Charon
 
-# 5. Generate / view caption + 5 hashtags
-python tools/cli.py caption my-deepdive
+# 5. Validate timing & pacing rules (mostly ~3s, sometimes ~2s)
+python tools/cli.py check <slug>
 
-# 6. Validate timing & pacing rules (< 3s in 1st min, ~2s avg)
-python tools/cli.py check my-deepdive
-
-# 7. One-command automated production pipeline
-#    - Produces primary video + companion short (if long) + thumbnail (if long)
-#    - Generates caption + 5 hashtags
-#    - Automatically purges all intermediate scratch files
-#    - Updates topics/completed_topics.json
-python tools/cli.py auto my-deepdive --voice Charon
+# 6. 1-Command Autonomous Production
+# - Generates primary video + companion short (if long) + thumbnail (if long)
+# - Rotates background music dynamically from 12 curated tracks
+# - Generates social caption + 5 hashtags
+# - Cleans up all intermediate scratch files automatically
+# - Updates topics/completed_topics.json
+python tools/cli.py auto <slug>
 ```
 
 ---
 
-## 📄 License
+## 🎯 Topic Deduplication System
 
-MIT License. Free for personal and commercial content creation.
+- **Inspect Next Topic**:
+  ```bash
+  python tools/cli.py topics next
+  ```
+- **List All Candidate Topics**:
+  ```bash
+  python tools/cli.py topics list
+  ```
+- **Inspect Completed Production Ledger**:
+  ```bash
+  python tools/cli.py topics completed
+  ```
+- **Add Your Own Topic**:
+  ```bash
+  python tools/topics.py add "The Pygmalion Effect" --category "Social Psychology" --scenario "Higher expectations lead to an increase in performance"
+  ```

@@ -1,7 +1,7 @@
 """Validation gate: verifies slide images, word triggers, and timing constraints.
-Enforces the strict retention pacing rule:
-- First minute (both short and long): Every image must stay on screen for < 3.0 seconds, averaging ~2.0 seconds.
-- After 2 minutes (long form): Images can stay for 5.0 to 6.0 seconds (hard cap <= 6.0s).
+Enforces the retention pacing rule:
+- Mostly 3 seconds, sometimes 2 seconds (range 1.8s - 3.8s, target average ~2.8s - 3.2s)
+- Long-form deep dive (after 2 minutes): 5.0s to 6.0s (hard cap <= 6.0s)
 """
 from pathlib import Path
 from common import load_json, probe_duration
@@ -69,14 +69,12 @@ def check_project(pdir):
 
     # Check slide durations
     # Rules:
-    # 1. First minute (t < 60.0s) for BOTH short and long:
-    #    - Strictly < 3.0s (hard cap < 3.0s)
-    #    - Average duration target: ~2.0s across all first-minute slides
-    # 2. After first minute:
-    #    - Short mode: strictly <= 3.0s
-    #    - Long mode:
-    #        * 60s to 120s: <= 4.0s (bridge phase)
-    #        * 120s+ (2 mins+): 5.0s to 6.0s (hard cap <= 6.0s)
+    # 1. First minute (or Short mode):
+    #    - Mostly 3s, sometimes 2s (range: 1.8s to 3.8s)
+    #    - Warn if < 1.8s (too fast/rushed)
+    #    - Warn/violation if > 3.8s (dragging on too long)
+    # 2. Long mode after 2 minutes:
+    #    - 5.0s to 6.0s (hard cap <= 6.0s)
     pacing_violations = []
     first_min_durations = []
 
@@ -86,23 +84,23 @@ def check_project(pdir):
         duration = max(0.0, end - start)
         timeline[i]['duration'] = duration
         
-        if start < 60.0:
+        if start < 60.0 or not is_long:
             first_min_durations.append(duration)
-            if duration >= 3.0:
+            if duration < 1.8:
+                warnings.append(
+                    f"Slide '{timeline[i]['name']}' at {start:.1f}s lasts {duration:.1f}s (too short; target ~3s, sometimes ~2s, min 1.8s)."
+                )
+            elif duration > 3.8:
                 pacing_violations.append(
-                    f"Slide '{timeline[i]['name']}' at {start:.1f}s lasts {duration:.1f}s (>= 3.0s; MUST be < 3.0s in 1st minute)."
+                    f"Slide '{timeline[i]['name']}' at {start:.1f}s lasts {duration:.1f}s (> 3.8s; target ~3s, sometimes ~2s)."
                 )
         else:
-            if is_long:
-                if start < 120.0:
-                    max_allowed = 4.0
-                    phase_label = "minute 1 to 2 [bridge phase]"
-                else:
-                    max_allowed = 6.0
-                    phase_label = "after 2 mins [deep-dive phase]"
+            if start < 120.0:
+                max_allowed = 4.0
+                phase_label = "minute 1 to 2 [bridge phase]"
             else:
-                max_allowed = 3.0
-                phase_label = "short [viral pacing]"
+                max_allowed = 6.0
+                phase_label = "after 2 mins [deep-dive phase]"
 
             if duration > max_allowed:
                 pacing_violations.append(
@@ -126,13 +124,15 @@ def check_project(pdir):
     for pv in pacing_violations:
         warnings.append(f"[PACING] {pv}")
 
-    # Check 1st minute average
+    # Check average duration in 1st minute / short
     avg_str = ""
     if first_min_durations:
         avg_dur = sum(first_min_durations) / len(first_min_durations)
-        avg_str = f" | 1st-min avg: {avg_dur:.2f}s ({len(first_min_durations)} slides, target ~2.0s)"
-        if avg_dur > 2.4:
-            warnings.append(f"1st-minute average duration is {avg_dur:.2f}s (exceeds ~2.0s average target).")
+        avg_str = f" | avg duration: {avg_dur:.2f}s ({len(first_min_durations)} slides, target ~2.8s-3.2s)"
+        if avg_dur < 2.4:
+            warnings.append(f"Average duration ({avg_dur:.2f}s) is too fast. Target is mostly 3s, sometimes 2s (~2.8s-3.2s avg).")
+        elif avg_dur > 3.6:
+            warnings.append(f"Average duration ({avg_dur:.2f}s) is too slow. Target is mostly 3s, sometimes 2s (~2.8s-3.2s avg).")
                 
     mode_str = f"Long-Form 1920x1080 ({dur / 60:.1f} min)" if is_long else f"Short/Reel 720x1600 ({dur:.1f}s)"
     print(f"\n[Check] Validating '{cfg.get('slug', pdir.name)}' [{mode_str}]:")
@@ -143,7 +143,7 @@ def check_project(pdir):
         print(f"  [ERROR] {e}")
         
     if not errors and not pacing_violations:
-        print("  [SUCCESS] All critical checks and pacing rules passed (< 3s in 1st min, ~2s avg).")
+        print("  [SUCCESS] All critical checks and pacing rules passed (mostly 3s, sometimes 2s).")
     elif not errors:
-        print("  [PASSED WITH PACING WARNINGS] Audio and images exist; review pacing violations above.")
+        print("  [PASSED WITH PACING WARNINGS] Audio and images exist; review pacing warnings above.")
     return len(errors) == 0

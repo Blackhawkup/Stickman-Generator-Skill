@@ -69,7 +69,7 @@ def get_next_topic():
     return None
 
 
-def mark_completed(topic_name, slug=None, title=None, duration=0.0, slides=0, video_path=None):
+def mark_completed(topic_name, slug=None, title=None, duration=0.0, slides=0, video_path=None, music=None):
     slug = slug or slugify(topic_name)
     title = title or topic_name.upper()
     completed = get_completed_topics()
@@ -93,10 +93,12 @@ def mark_completed(topic_name, slug=None, title=None, duration=0.0, slides=0, vi
         entry['slides_count'] = slides
     if video_path:
         entry['video_path'] = str(video_path).replace('\\', '/')
+    if music:
+        entry['music'] = music
     entry['status'] = 'completed'
     
     save_json_file(COMPLETED_FILE, completed)
-    print(f"[Topic Registry] Marked '{topic_name}' as completed in {COMPLETED_FILE.name}")
+    print(f"[Topic Registry] Marked '{topic_name}' as completed (music: {music or 'default'}) in {COMPLETED_FILE.name}")
 
 
 def add_topic_idea(topic_name, category="General Psychology", hook_scenario="", core_concept="", researcher=""):

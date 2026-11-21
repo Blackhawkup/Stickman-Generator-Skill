@@ -28,18 +28,22 @@ def build_page(pdir):
     W, H = get_dimensions(fmt)
     
     theme = cfg.get('theme', {})
-    bg_color = theme.get('background', '#FBF6EF')
+    bg_color = theme.get('canvas_bg', theme.get('background', '#FBF6EF'))
+    if str(bg_color).lower() in ('#000', '#000000', 'black'):
+        bg_color = '#FBF6EF'
     font_fam = theme.get('font_family', "'Comic Sans MS', 'Comic Neue', cursive, sans-serif")
     
     canvas_cfg = cfg.get('canvas', {
         'aspect_ratio': 'custom',
         'width': W,
         'height': H,
-        'canvas_bg': theme.get('canvas_bg', '#FBF6EF'),
+        'canvas_bg': bg_color,
         'border_radius': 0,
         'shadow': False,
         'blur_backdrop': False
     })
+    if str(canvas_cfg.get('canvas_bg', '')).lower() in ('#000', '#000000', 'black'):
+        canvas_cfg['canvas_bg'] = '#FBF6EF'
     
     bdir = pdir / 'build'
     bdir.mkdir(exist_ok=True, parents=True)

@@ -1,6 +1,6 @@
 ---
 name: stickman-generator
-description: Autonomous end-to-end production of stick-figure explainer slideshow videos in both Phone/Reels (720x1600) and Laptop/Long-Form (1920x1080) formats, featuring synchronized voice narration, editorial webcomic styling with rich 2D background details, ducked royalty-free background music, strict retention pacing (< 3s in 1st minute, ~2s average), automatic companion short generation, social captions with 5 hashtags, 1920x1080 YouTube thumbnail generation, and automatic cleanup of intermediate scratch files. Use when asked to generate, script, storyboard, render, or produce stickman explainer shorts or long-form slideshow videos.
+description: Autonomous end-to-end production of stick-figure explainer slideshow videos in both Phone/Reels (720x1600) and Laptop/Long-Form (1920x1080) formats, featuring synchronized voice narration, editorial webcomic styling with rich 2D background details, dynamic royalty-free background music rotation across 12 catalog tracks, strict retention pacing (mostly ~3s, sometimes ~2s; 5-6s after 2m in long form), mandatory "Imagine..." hook architecture, automatic companion short generation, social captions with 5 hashtags, 1920x1080 YouTube thumbnail generation, and automatic cleanup of intermediate scratch files. Use when asked to generate, script, storyboard, render, or produce stickman explainer shorts or long-form slideshow videos.
 ---
 
 # Stickman Slideshow Explainer Generator
@@ -8,7 +8,7 @@ description: Autonomous end-to-end production of stick-figure explainer slidesho
 A streamlined, high-speed autonomous explainer video production system that synchronizes editorial stick-figure comic illustrations with voice narration and ducked background music.
 
 Supports two distinct production modes:
-1. **Phone / Short / Reel Mode**: **720 x 1600** vertical video, centered with matching warm cream background fill.
+1. **Phone / Short / Reel Mode**: **720 x 1600** vertical video, centered with matching warm cream background fill (`#FBF6EF`). Zero black bars.
 2. **Laptop / Long-Form Mode**: **1920 x 1080** widescreen video (16:9), which **automatically generates a companion 720x1600 Short** from the opening hook and a matching **1920x1080 YouTube thumbnail**!
 
 ---
@@ -25,24 +25,45 @@ Activate this skill when:
 
 ---
 
-## ⚡ Core Operating Guardrails
+## 🚨 Mandatory Hook Architecture (Non-Negotiable)
 
-### 1. Pacing & Timing Rules
-
-#### A. The 1st Minute Retention Rule (Both Short & Long-Form)
-- **Ceiling**: Every single image in the first 60 seconds MUST stay on screen for **less than 3 seconds** (`< 3.0s`).
-- **Average Duration**: **~2.0 seconds on average** across all slides in the first minute.
-- **Slide Count**: ~28 to 32 slides in the opening 60 seconds.
-
-#### B. Subsequent Minutes (Long-Form Mode)
-- **Minute 1:00 – 2:00 (Bridge Phase)**: Transitions every **2.5s to 4.0s** (hard cap `<= 4.0s`).
-- **Minute 2:00 – 10:00 (Deep Exposition & Case Studies)**: Images are allowed to stay on screen for **5.0 to 6.0 seconds** (average ~4.8s–5.5s, hard cap `<= 6.0s`) to let complex case studies, study methodologies, and mental models breathe.
-- **Automated Validation**: Run `python tools/cli.py check <slug>`. The auditor enforces `< 3.0s` and checks the `~2.0s` average in the first minute, `<= 4.0s` before 2m, and `<= 6.0s` thereafter.
+Every script (both Short and Long-Form) MUST start with this EXACT 2-sentence opening:
+1. **Sentence 1**: The Topic Title in uppercase followed by a period (e.g. `THE PRATFALL EFFECT.` or `THE SUNK COST FALLACY.`).
+2. **Sentence 2**: MUST start with `"Imagine a guy..."`, `"Imagine you..."`, or `"Imagine if you..."`:
+   - *"Imagine a brilliant speaker in a sharp suit walks onto a stage, delivers a flawless presentation, and then spills hot coffee all over his shirt."*
+   - *"Imagine you buy a forty-dollar ticket to a movie, and thirty minutes in, it's completely unwatchable."*
+3. **STRICT NEGATIVE CONSTRAINT**: NEVER start with fictional character names (e.g. *"Leo walked into the office..."*, *"David was a manager..."*). NEVER start with creator filler like *"Hey guys"* or unrelated rhetorical questions.
 
 ---
 
-### 2. Resolution & Aspect Ratios
+## ⏱️ Pacing & Timing Rules
 
+### 1. The Opening / Shorts Pacing (Mostly 3s, Sometimes 2s)
+- **Standard Duration**: Mostly **around 3.0 seconds** (2.6s to 3.5s) so viewers can absorb the comic art, props, and captions.
+- **Snappy Transitions**: Sometimes **around 2.0 seconds** (1.8s to 2.4s) for quick punchy reveals, surprise beats, or sudden realization cuts.
+- **Bounds**: Minimum 1.8 seconds (avoid frantic 1s flashes), maximum ceiling 3.8 seconds (never drag).
+- **Target Average**: **~2.8s to 3.2s** across all slides in a short (~20 to 25 slides per ~60–75s video).
+
+### 2. Subsequent Minutes (Long-Form Mode)
+- **Minute 1:00 – 2:00 (Bridge Phase)**: Transitions every **3.0s to 4.0s** (hard cap `<= 4.0s`).
+- **Minute 2:00 – 10:00 (Deep Exposition & Case Studies)**: Images are allowed to stay on screen for **5.0 to 6.0 seconds** (average ~5.0s–5.5s, hard cap `<= 6.0s`) to let complex studies, methodologies, and mental models breathe.
+- **Automated Validation**: Run `python tools/cli.py check <slug>`. The auditor enforces these pacing bounds.
+
+---
+
+## 🎵 Dynamic Background Music Rotation (12 Tracks)
+
+Never repeat the same background music track across videos:
+- Curated library of 12 royalty-free instrumental tracks in `audio/music/`:
+  `curious`, `investigation`, `mystery`, `sneaky`, `playful`, `quirky`, `upbeat`, `reflective`, `deep_mystery`, `thoughtful`, `light`, `comedy`.
+- When set to `"music": "auto"` (the default), `mix.py` automatically maps the topic theme and mood to track candidates while inspecting `topics/completed_topics.json` to prevent back-to-back repeats.
+- Narration is mastered to **-14.0 LUFS** with music dynamically ducked to **-26.0 dB** behind speech.
+
+---
+
+## 🎨 Visual DNA, Canvas & Centering
+
+### 1. Canvas Dimensions & Zero Black Bars
 | Mode | Canvas Dimensions | Layout & Background Fill | Flow Aspect Ratio |
 |---|---|---|---|
 | **Phone / Short / Reel** | **720 x 1600** (Vertical) | Centered artwork; entire screen filled with warm cream (`#FBF6EF`) | `1:1` (Centered) |
@@ -50,27 +71,25 @@ Activate this skill when:
 | **YouTube Thumbnail** | **1920 x 1080** (Widescreen 16:9) | High-contrast dramatic thumbnail with large topic title | `16:9` |
 
 > [!IMPORTANT]
-> In all formats, the image stays in the center and the entire rest of the frame is filled with the exact same background color (`#FBF6EF` warm off-white cream). Zero black bars, zero harsh borders.
+> The image stays in the center and the entire rest of the frame is filled with the exact same warm cream background color (`#FBF6EF`). Zero black bars, zero harsh borders.
+
+### 2. Slide 01 Opening Rule (Title Card)
+- **Slide 01** is the viewer's very first impression. It MUST be a compelling, high-CTR **Title Card**.
+- `top_title`: Exact phenomenon name in uppercase.
+- `bottom_caption`: 1 punchy hook subtitle (e.g. `WHY FLAWS MAKE US LIKEABLE.`, `WHY WE CAN'T LET GO.`).
+- `subject`: Rich stylized 2D room setting (wooden bookshelf, potted indoor plant, framed picture) with an expressive stick figure in a bold primary shirt reacting with wide curious eyes.
+- **STRICT PROHIBITION**: NEVER generate a plain, blank walking stickman or empty void for Slide 01.
+
+### 3. Rich 2D Background Details
+- Every image includes charming 2D background details drawn in fine black ink lines:
+  * Mid-century wooden bookshelves with colorful books, framed wall art, modern potted indoor plants (fiddle-leaf fig, monstera), stylish floor lamps, cozy desks with laptops and mugs, wall clocks, patterned rugs.
+  * Offices/Labs: Glass partitions, chalkboards with flowcharts and arrows, corkboards with notes.
+  * Outdoor: Stylized clouds in the warm cream sky, soft rolling hills, distant city skyline silhouettes, lampposts.
+- Background palette uses muted earthy neutrals (slate gray, soft taupe, olive green, warm wood) keeping the primary-colored characters as the clear focal point.
 
 ---
 
-### 3. Visual DNA & Rich 2D Background Details
-- **Characters**: Stylized stick figures with oversized round white heads, expressive dot eyes and eyebrows, rounded bean-shaped torsos, thin black stick limbs, wearing solid bold primary color shirts:
-  - **Red**: Urgent, aggressive, results-focused (`#DC2626`).
-  - **Yellow**: Enthusiastic, chaotic, spontaneous (`#EAB308`).
-  - **Green**: Calm, passive, conflict-avoidant (`#16A34A`).
-  - **Blue**: Analytical, meticulous, methodical (`#2563EB`).
-- **Rich 2D Environmental Backgrounds**:
-  - Scenes feature polished, charming 2D background details drawn in fine black ink lines:
-    * Indoor: Mid-century wooden bookshelves with colorful book spines, framed wall art, modern potted indoor plants (fiddle-leaf fig, monstera), stylish floor lamps, cozy desks with laptops and mugs, wall clocks, patterned rugs.
-    * Offices / Labs: Glass partitions, chalkboards with flowcharts and arrows, corkboards with notes.
-    * Outdoor: Stylized clouds in the warm cream sky, soft rolling hills, distant city skyline silhouettes, lampposts.
-  - Background palette uses muted earthy neutrals (slate gray, soft taupe, olive green, warm wood) so the environment looks rich and appealing while keeping the primary-colored stick figures as the clear focal point.
-- **Linework & Shading**: Thick uniform black ink outlines on characters, fine outlines on backgrounds, flat 2D cel coloring, soft oval gray ground shadows.
-
----
-
-### 4. Working Directory & Automatic Scratch Cleanup
+## 🧹 Working Directory & Automatic Scratch Cleanup
 - **Save Location**: The directory where the agent is run is the exact directory where all project files and deliverables are created.
 - **Automatic Post-Production Cleanup**: After video rendering, all intermediate scratch files and folders (`build/`, `voice/`, `images/`, `out_frames/`, temporary audio WAVs) are **automatically deleted**.
 - **Preserved Deliverables**:
@@ -80,13 +99,6 @@ Activate this skill when:
   4. Social Media Caption + 5 Hashtags (`<slug>-caption.txt`)
   5. Metadata Record (`<slug>-metadata.json`)
   6. Updated Topic Ledger (`topics/completed_topics.json`)
-
----
-
-### 5. Dual Audio Engine & Ducking
-- Spoken narration mastered to **-14.0 LUFS** integrated loudness.
-- Background music auto-selected from `audio/music/` and ducked to **-26.0 dB** behind voice.
-- Ambient bed seamlessly loops across any duration (from 1 minute to 10+ minutes).
 
 ---
 
@@ -105,7 +117,7 @@ python tools/cli.py prompts <slug>
 # Generate TTS voiceover and Whisper word timestamps
 python tools/cli.py tts <slug> --voice Charon
 
-# Validate timing & pacing rules (< 3s in 1st min, ~2s avg)
+# Validate timing & pacing rules (mostly ~3s, sometimes ~2s)
 python tools/cli.py check <slug>
 
 # 1-Command Autonomous Production
@@ -128,9 +140,11 @@ When the user asks for a video:
 3. **Draft Script**:
    - For Short: Use `prompts/script_prompt.md`.
    - For Long-Form: Use `prompts/script_long_prompt.md`.
+   - **Enforce**: Sentence 1 = `[TITLE].`, Sentence 2 = `Imagine [a guy / you / if you]...` (no named fiction characters).
 4. **Storyboard**:
-   - Enforce `< 3.0s` per slide in the 1st minute, averaging `~2.0s` (~30 slides in minute 1).
+   - Enforce mostly ~3s, sometimes ~2s (~20-25 slides in a short).
    - In long form, slides after minute 2 stay for 5–6 seconds.
+   - Slide 01 MUST be a rich Title Card (never a plain walking stickman).
 5. **Execute Auto Pipeline**: Run `python tools/cli.py auto <slug>`.
    - Produces video(s), caption + 5 hashtags, and thumbnail (for long).
    - Automatically purges scratch folders (`build/`, `voice/`, `images/`).

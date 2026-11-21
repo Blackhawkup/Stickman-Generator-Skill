@@ -32,7 +32,7 @@
     "fade_duration": 0.0,
     "ken_burns_zoom": 1.0
   },
-  "music": "curious",
+  "music": "auto",
   "music_db": -26,
   "pacing": {
     "lead": 0.0,

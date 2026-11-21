@@ -1,41 +1,60 @@
-# Script Generation Prompt
+# Spoken Narration Script Prompt (Shorts)
 
-Write a spoken narration script for a timed visual slideshow explainer on the following topic.
+Write a spoken narration script for a timed visual slideshow explainer short.
 
 ---
 
 ## Input Variables
 
 - **Topic**: `"{TOPIC}"`
-- **Core Angle**: `"{ANGLE}"`
-- **Target Duration**: `"{DURATION_SECONDS}"` seconds (approx. `{TARGET_WORDS}` words, typically 240-280 words for a 60-70s video)
-- **Audience**: `"{AUDIENCE}"`
+- **Core Concept**: `"{CORE_CONCEPT}"`
+- **Target Duration**: ~60 to 75 seconds (approx. 200–240 spoken words, ~20–25 visual beats)
+- **Audience**: General audience interested in psychology, human behavior, decision-making, and paradoxes.
+
+---
+
+## 🚨 MANDATORY HOOK ARCHITECTURE (NON-NEGOTIABLE)
+
+Every script MUST begin with this EXACT 2-part opening formula:
+
+### 1. Sentence 1: The Topic Title (One Short Sentence)
+Name the exact phenomenon in uppercase followed by a period.
+- Examples:
+  * `THE PRATFALL EFFECT.`
+  * `THE SUNK COST FALLACY.`
+  * `THE SPOTLIGHT EFFECT.`
+
+### 2. Sentence 2: The Direct "Imagine..." Viewer Immersion
+The VERY NEXT sentence MUST begin with the word **"Imagine"**:
+- **"Imagine a guy..."** (e.g., *"Imagine a brilliant speaker in a sharp suit walks onto a stage, delivers a flawless presentation, and then spills hot coffee all over his shirt."*)
+- **"Imagine you..."** (e.g., *"Imagine you buy a forty-dollar ticket to a movie, and thirty minutes in, it's completely unwatchable."*)
+- **"Imagine if you..."** (e.g., *"Imagine if you spend three months preparing for a meeting, convinced everyone is watching your every move."*)
+
+### ❌ STRICT NEGATIVE CONSTRAINTS (DO NOT VIOLATE):
+- **NEVER use named fiction characters** like *"Leo walked into the office..."*, *"David was a software engineer..."*, or *"Sarah opened her laptop..."*.
+- **NEVER start with creator filler** like *"Hey guys"*, *"Welcome back"*, or rhetorical questions without "Imagine".
+- The first two sentences MUST ALWAYS be:
+  `[TOPIC TITLE]. Imagine [a guy / you / if you]...`
 
 ---
 
 ## Storytelling Sequence (Must Follow Exactly)
 
-1. **The Hook (1 short sentence)**: Immediately name the concept or phenomenon (e.g., *"Surrounded by idiots."* or *"The Pratfall Effect."*).
-2. **The Relatable Fictional Scenario**: Introduce a familiar everyday situation with distinct characters (e.g., 4 friends trying to plan a weekend trip, or coworkers in a meeting). Give each character a clear, conflicting goal or personality.
-3. **The Escalation & Contradiction**: Show the impasse or contradiction develop (e.g., *"Two weeks later, the trip still has not happened and all four of them are thinking the same thing: Why are my friends like this?"*).
-4. **The Origin / Book Reveal**: Reveal the concept's popular origin or book (e.g., *"This is the idea behind Surrounded by Idiots, a book by Swedish writer Thomas Erikson."*).
-5. **The Core Reframe**: Reframe the misunderstanding (e.g., *"His point is that most of the time people are not stupid. They're just speaking a different language."*).
-6. **Historical / Theoretical Roots**: Connect it to its historical foundation (e.g., Hippocrates' four temperaments, or Jungian archetypes).
-7. **The Systematic Breakdown (3-4 Types/Phases)**: Break down the system concisely with vivid, contrasting traits:
-   - Type 1 (e.g., *Reds*: bold, driven, wants results, hates small talk).
-   - Type 2 (e.g., *Yellows*: social, energetic, misses details).
-   - Type 3 (e.g., *Greens*: calm, loyal, hates conflict, fears change).
-   - Type 4 (e.g., *Blues*: analytical, careful, wants facts, figures, and why).
-8. **The Clash**: Describe what happens when they collide (e.g., *"Put them in one group chat and each one thinks the others are doing it wrong."*).
-9. **The Scientific Nuance / Critique**: Acknowledge real-world limitations or psychological critiques (e.g., *"To be fair, many psychologists criticize models like this. Real personalities are far too complex for four colors..."*).
-10. **The Memorable Takeaway / Punchline**: Land a memorable, thought-provoking concluding punchline (e.g., *"When someone seems like an idiot, you might just be crossing wires. And remember, when you walk into a room, you are somebody else's idiot too."*).
+1. **The Hook Title Card**: Name the concept (e.g. `THE PRATFALL EFFECT.`).
+2. **The "Imagine..." Scenario**: Open with `Imagine a guy...` or `Imagine you...` introducing the everyday dilemma.
+3. **The Escalation & Paradox**: Show the unexpected twist or realization (e.g. *"Instead of losing respect, everyone in the room suddenly likes him twice as much."*).
+4. **The Concept Explanation**: Explain why our brain acts this way in simple, visual terms.
+5. **The Research / Study**: Name the researcher and the classic experiment (e.g. Elliot Aronson in 1966).
+6. **The Underlying Mechanism**: Explain what is happening beneath the surface (e.g. vulnerability humanizes competence; perfection creates distance).
+7. **Everyday Real-World Traps**: Show how this impacts daily life (workplace, dating, social anxiety).
+8. **The Memorable Takeaway / Punchline**: Conclude with a thought-provoking, lightbulb closing insight.
 
 ---
 
-## Writing Requirements
+## Writing & Timing Requirements
 
-- **Conversational, spoken cadence**: Written for the ear, not the eye.
-- **Short, punchy sentences**: Keep phrasing crisp.
-- **Concrete, drawable nouns**: Every single sentence must translate directly into a clear visual action, character expression, or labeled prop.
-- **Double line breaks**: Separate distinct narrative beats with double line breaks.
-- **Strictly output only the narration text**: No timestamps, slide tags, or meta commentary.
+- **Speaking Pace**: Conversational, spoken cadence (~140 words per minute).
+- **Slide Spacing**: Each visual beat should last **around 3 seconds, and sometimes 2 seconds** (range 2.0s to 3.5s). Aim for **20 to 25 distinct visual sentences** in total.
+- **Concrete Visual Nouns**: Every sentence must translate into a clear drawable scene, character emotion, or labeled prop.
+- **Double Line Breaks**: Separate distinct narrative beats with double line breaks.
+- **Output Clean Text Only**: No timestamps, brackets, or meta notes. Spoken words only.

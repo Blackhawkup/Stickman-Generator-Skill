@@ -284,7 +284,15 @@ def main():
         import topics
         slides = load_json(pdir / 'slides.json')
         dur = probe_duration(out_mp4) if out_mp4.exists() else 0.0
-        topics.mark_completed(topic_name, slug=slug, title=cfg.get('title', topic_name.upper()), duration=dur, slides=len(slides), video_path=out_mp4)
+        topics.mark_completed(
+            topic_name,
+            slug=slug,
+            title=cfg.get('title', topic_name.upper()),
+            duration=dur,
+            slides=len(slides),
+            video_path=out_mp4,
+            music=cfg.get('music')
+        )
 
         # Step 8: Clean up intermediate scratch files (preserving only deliverables)
         cleanup.cleanup_project(pdir, keep_temp=args.keep_temp)
