@@ -1,6 +1,7 @@
 """Companion Short Extractor:
 Automatically extracts the opening ~1 minute hook from a 10-minute long-form explainer
-and renders a vertical 9:16 60fps Short (out/<slug>-short.mp4) formatted identically to a standalone short.
+and renders a vertical 720x1600 60fps Short (out/<slug>-short.mp4) formatted for phone/reels
+with seamless warm cream background (#FBF6EF) fill.
 """
 import asyncio, json, os, shutil, subprocess
 from pathlib import Path
@@ -8,7 +9,7 @@ from common import load_json, save_json, run, probe_duration, ENGINE_DIR, die
 from render import render_slideshow
 
 
-def extract_short(pdir, out_short_mp4=None, max_duration=72.0):
+def extract_short(pdir, out_short_mp4=None, max_duration=65.0):
     pdir = Path(pdir)
     cfg = load_json(pdir / 'film.json')
     slides = load_json(pdir / 'slides.json')
@@ -24,12 +25,9 @@ def extract_short(pdir, out_short_mp4=None, max_duration=72.0):
         out_short_mp4 = Path(out_short_mp4)
 
     # 1. Determine which slides belong to the opening ~1 min Short
-    # Check if slides have explicit 'short_candidate' flag
     short_slides = [s for s in slides if s.get('short_candidate') is True]
     
-    # If no explicit flags, pick slides up to ~60-70 seconds using timestamps
     if not short_slides:
-        # Calculate timestamps
         def norm(w):
             return ''.join(c for c in (w or '').lower() if c.isalnum())
         nwords = [{'k': norm(x.get('w', '')), 's': x.get('s', 0.0), 'e': x.get('e', 0.0)} for x in words]
@@ -56,13 +54,12 @@ def extract_short(pdir, out_short_mp4=None, max_duration=72.0):
             if t is not None and t > max_duration and len(chosen) >= 15:
                 break
             chosen.append(s)
-            # Stop if we reach ~25 slides or around 60-75s
-            if len(chosen) >= 30:
+            if len(chosen) >= 32:
                 break
         short_slides = chosen
 
     if not short_slides:
-        short_slides = slides[:min(25, len(slides))]
+        short_slides = slides[:min(30, len(slides))]
 
     # Determine end time of the short
     last_slide_idx = slides.index(short_slides[-1])
@@ -70,7 +67,6 @@ def extract_short(pdir, out_short_mp4=None, max_duration=72.0):
         next_slide = slides[last_slide_idx + 1]
         next_t = next_slide.get('time')
         if next_t is None and words:
-            # find timestamp
             tokens = [norm(t) for t in (next_slide.get('trigger', '')).split() if norm(t)]
             for i in range(len(nwords) - len(tokens) + 1):
                 if all(nwords[i + j]['k'] == tokens[j] for j in range(len(tokens))):
@@ -101,23 +97,23 @@ def extract_short(pdir, out_short_mp4=None, max_duration=72.0):
         str(short_audio)
     ])
 
-    # 3. Build vertical 9:16 companion short viewer
+    # 3. Build vertical 720x1600 companion short viewer
     shutil.copy(ENGINE_DIR / 'slideshow.js', bdir / 'slideshow.js')
     
-    # 9:16 layout with centered 1:1 canvas (standard short format)
+    # 720x1600 phone layout with matching cream background (#FBF6EF)
     short_film = {
-        'W': 1080,
-        'H': 1920,
-        'format': '9:16',
+        'W': 720,
+        'H': 1600,
+        'format': '720:1600',
         'theme': {
-            'background': '#000000',
+            'background': '#FBF6EF',
             'font_family': "'Comic Sans MS', 'Comic Neue', cursive, sans-serif",
             'canvas_bg': '#FBF6EF'
         },
         'canvas': {
-            'aspect_ratio': '1:1',
-            'width': 1080,
-            'height': 1080,
+            'aspect_ratio': '720:1600',
+            'width': 720,
+            'height': 1600,
             'canvas_bg': '#FBF6EF',
             'border_radius': 0,
             'shadow': False,
@@ -142,26 +138,27 @@ def extract_short(pdir, out_short_mp4=None, max_duration=72.0):
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     html, body {{
-      width: 1080px;
-      height: 1920px;
+      width: 720px;
+      height: 1600px;
       overflow: hidden;
-      background: #000000;
+      background: #FBF6EF;
       font-family: 'Comic Sans MS', 'Comic Neue', cursive, sans-serif;
       user-select: none;
     }}
     #viewport {{
       position: absolute;
       inset: 0;
-      width: 1080px;
-      height: 1920px;
+      width: 720px;
+      height: 1600px;
       overflow: hidden;
-      background: #000000;
+      background: #FBF6EF;
     }}
     #slides-container {{
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
+      background: #FBF6EF;
     }}
   </style>
 </head>
@@ -179,8 +176,8 @@ def extract_short(pdir, out_short_mp4=None, max_duration=72.0):
     short_html = bdir / 'page_short.html'
     short_html.write_text(html_content, encoding='utf-8')
 
-    # 4. Render companion short MP4 (1080x1920, 60fps)
-    print(f"[Companion Short] Rendering vertical 9:16 short ({short_dur:.1f}s) to {out_short_mp4}...")
+    # 4. Render companion short MP4 (720x1600, 60fps)
+    print(f"[Companion Short] Rendering vertical phone 720x1600 short ({short_dur:.1f}s) to {out_short_mp4}...")
     
     async def render_short():
         from playwright.async_api import async_playwright
@@ -191,7 +188,7 @@ def extract_short(pdir, out_short_mp4=None, max_duration=72.0):
         fps = 60
         scale = 1.0
         crf = 16
-        W, H = 1080, 1920
+        W, H = 720, 1600
         total_frames = round(short_dur * fps)
         n_workers = max(1, min(int(os.environ.get('WB_WORKERS', '0')) or max(1, (os.cpu_count() or 4) // 2), 6))
         
@@ -222,5 +219,5 @@ def extract_short(pdir, out_short_mp4=None, max_duration=72.0):
                 run(args)
 
     asyncio.run(render_short())
-    print(f"\n[Success] Companion Short Rendered: {out_short_mp4} ({short_dur:.1f}s, 1080x1920, 60fps)")
+    print(f"\n[Success] Companion Short Rendered: {out_short_mp4} ({short_dur:.1f}s, 720x1600, 60fps)")
     return out_short_mp4

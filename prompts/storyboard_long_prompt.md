@@ -1,32 +1,37 @@
 # 10-Minute Long-Form Storyboard & Pacing Breakdown
 
-Instructions for converting a 10-minute explainer script into a timed visual storyboard (`slides.json`) with dual-phase pacing guardrails.
+Instructions for converting a 10-minute explainer script into a timed visual storyboard (`slides.json`) with multi-phase pacing guardrails.
 
 ---
 
-## ⏱️ Dual-Phase Pacing Guardrails
+## ⏱️ Multi-Phase Pacing Guardrails
 
 ```
-Phase 1: High-Retention Hook Window (0:00 - 2:00)
-├── Duration per slide: Strictly 2.0s to 4.0s (average ~2.8s)
-├── Maximum ceiling: 4.0 seconds (hard cap)
-└── Slide count: ~30 to 35 slides
+Phase 1: The 1st Minute Hook (0:00 - 1:00)
+├── Ceiling: Every slide must stay on screen for LESS than 3.0 seconds (< 3.0s)
+├── Average: ~2.0 seconds on average across all slides
+├── Range: 1.2s to 2.8s per slide
+└── Slide count: ~28 to 32 slides (forms the companion 720x1600 Short!)
 
-Phase 2: Deep Exposition & Case Studies (2:00 - 10:00)
-├── Duration per slide: 4.0s to 6.0s (average ~4.8s)
-├── Maximum ceiling: 6.0 seconds (hard cap)
-└── Slide count: ~85 to 110 slides
+Phase 2: The Bridge Phase (1:00 - 2:00)
+├── Ceiling: Maximum 4.0 seconds per slide (<= 4.0s)
+├── Average: ~3.0s per slide
+└── Slide count: ~18 to 22 slides
 
-Total Storyboard Size: ~115 to 145 slides for a 10-minute video.
+Phase 3: Deep Exposition & Case Studies (2:00 - 10:00)
+├── Duration per slide: 5.0s to 6.0s (average ~4.8s - 5.5s)
+├── Ceiling: Maximum 6.0 seconds per slide (<= 6.0s)
+└── Slide count: ~80 to 95 slides
+
+Total Storyboard Size: ~125 to 150 slides for a 10-minute video.
 ```
 
 ---
 
-## 🎯 Companion Short Flagging
+## 🎯 Companion Short Flagging & Thumbnail
 
-The first minute of slides (typically slides 1 to ~20–25, covering timestamps `0.0s` to `~60–70s`) forms the **Autonomous Companion Short**.
-- Tag each of these slides with `"short_candidate": true`.
-- The pipeline will automatically slice these slides, audio, and words to generate a vertical 9:16 Short (`out/<slug>-short.mp4`) alongside the full 16:9 10-minute video (`out/<slug>-long.mp4`).
+1. **Companion Short**: Slides 1 to ~30 (the first minute) automatically form the 720x1600 vertical companion short (`out/<slug>-short.mp4`). Tag with `"short_candidate": true`.
+2. **1920x1080 YouTube Thumbnail**: Automatically generated in the same editorial stick-figure comic style, featuring the large topic name across the top and a dramatic visual scene with rich background details.
 
 ---
 
@@ -39,15 +44,7 @@ The first minute of slides (typically slides 1 to ~20–25, covering timestamps 
     "trigger": "the sunk cost fallacy",
     "top_title": "THE SUNK COST FALLACY",
     "bottom_caption": "WHY WE CAN'T LET GO.",
-    "subject": "Bold title card. Large clean typography, character standing next to a giant question mark",
-    "short_candidate": true
-  },
-  {
-    "name": "slide_02_vip_ticket",
-    "trigger": "imagine you buy a 40 dollar ticket",
-    "top_title": "THE SUNK COST FALLACY",
-    "bottom_caption": "A 40 DOLLAR MISTAKE.",
-    "subject": "A cheerful stick-figure holding a gold VIP movie ticket with a bright yellow shirt",
+    "subject": "Bold title card. Large clean typography, character standing in front of a stylish wooden bookshelf with colorful books and a modern potted plant",
     "short_candidate": true
   },
   {
@@ -55,7 +52,7 @@ The first minute of slides (typically slides 1 to ~20–25, covering timestamps 
     "trigger": "the supersonic concorde airliner",
     "top_title": "THE CONCORDE DISASTER",
     "bottom_caption": "BILLIONS IN THE SKY.",
-    "subject": "Wide landscape 16:9 view. Two government officials in black suits standing on an airstrip looking at a sleek supersonic passenger jet, stacks of cash flying into the jet engine",
+    "subject": "Wide landscape 1920x1080 view. Two government officials in black suits standing on an airstrip looking at a sleek supersonic passenger jet, airport hangar and control tower in the background, stacks of cash flying into the jet engine",
     "short_candidate": false
   }
 ]
@@ -66,10 +63,6 @@ The first minute of slides (typically slides 1 to ~20–25, covering timestamps 
 ## Storyboard Rules for Long-Form
 
 1. **Acoustic Trigger Matching**: Every `trigger` must be an exact 2–5 word phrase verbatim from `script.md`.
-2. **Visual Progression**: Even during longer 4–6s slides in Phase 2, each slide must show a clear new concept, diagram, character action, or visual comparison.
-3. **16:9 Landscape Framing**: Compose subjects for a widescreen 1920x1080 canvas:
-   - Use the horizontal space: place contrasting characters on opposite sides (left vs right).
-   - Use multi-element diagrams, charts with simple stick figure annotations, and detailed environmental backdrops (offices, courtrooms, airfields, laboratories).
-4. **Validation Gate**: Run `python tools/cli.py check <slug>`. The auditor will automatically enforce:
-   - `<= 4.0s` for all slides starting before `120.0s`.
-   - `<= 6.0s` for all slides starting at or after `120.0s`.
+2. **First Minute Velocity**: Keep transitions fast (`< 3.0s`, avg `~2.0s`) during the initial 60 seconds to lock in audience retention.
+3. **Rich 2D Background Environments**: In every slide, include environmental details (bookshelves, framed artwork, potted plants, architectural outlines, office chalkboards, city skylines) drawn in fine black ink lines.
+4. **Widescreen Centering**: Composed for 1920x1080, centered with warm cream (`#FBF6EF`) background fill.

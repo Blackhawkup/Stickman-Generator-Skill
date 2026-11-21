@@ -1,16 +1,14 @@
 /* Slideshow Engine: Deterministic, seek-driven, timed to narration.
-   Supports instant cuts, letterbox 1:1 canvas on 9:16 vertical video, and real-time audio playback preview. */
+   Supports centered presentation with matching background fill for 720x1600 (phone) and 1920x1080 (laptop). */
 (function () {
   const FILM = window.FILM || {};
   const WORDS = window.WORDS || [];
   const SLIDES = window.SLIDES || [];
-  const W = FILM.W || 1080;
-  const H = FILM.H || 1920;
-  const FORMAT = FILM.format || '9:16';
+  const W = FILM.W || 720;
+  const H = FILM.H || 1600;
+  const FORMAT = FILM.format || '720:1600';
   const CANVAS_CFG = FILM.canvas || {};
-  const IS_SQUARE_IN_VERTICAL = (FORMAT === '9:16' && CANVAS_CFG.aspect_ratio === '1:1');
-  const CANVAS_H = IS_SQUARE_IN_VERTICAL ? W : H;
-  const CANVAS_TOP = IS_SQUARE_IN_VERTICAL ? Math.round((H - CANVAS_H) / 2) : 0;
+  const CANVAS_BG = CANVAS_CFG.canvas_bg || '#FBF6EF';
   
   const FADE_DUR = (FILM.transitions && FILM.transitions.fade_duration != null) ? FILM.transitions.fade_duration : 0.0;
   const KEN_BURNS = (FILM.transitions && FILM.transitions.ken_burns_zoom != null) ? FILM.transitions.ken_burns_zoom : 1.0;
@@ -78,33 +76,20 @@
     wrap.className = 'slide-wrapper';
     wrap.id = `slide_${idx}`;
     
-    if (IS_SQUARE_IN_VERTICAL) {
-      wrap.style.cssText = `
-        position: absolute;
-        top: ${CANVAS_TOP}px;
-        left: 0;
-        width: ${W}px;
-        height: ${CANVAS_H}px;
-        opacity: 0;
-        overflow: hidden;
-        background: ${CANVAS_CFG.canvas_bg || '#FBF6EF'};
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        will-change: transform, opacity;
-      `;
-    } else {
-      wrap.style.cssText = `
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        will-change: transform, opacity;
-      `;
-    }
+    // Fill full frame with matching background color, centering content
+    wrap.style.cssText = `
+      position: absolute;
+      inset: 0;
+      width: ${W}px;
+      height: ${H}px;
+      opacity: 0;
+      overflow: hidden;
+      background: ${CANVAS_BG};
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      will-change: transform, opacity;
+    `;
 
     // Optional backdrop blur only if enabled
     let bgBlur = null;
@@ -125,33 +110,20 @@
       wrap.appendChild(bgBlur);
     }
 
-    // Foreground main image
+    // Foreground main image centered with object-fit: contain
     const img = document.createElement('img');
     img.className = 'slide-img';
     img.src = item.src;
-    
-    if (IS_SQUARE_IN_VERTICAL) {
-      img.style.cssText = `
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        z-index: 2;
-        will-change: transform;
-      `;
-    } else {
-      img.style.cssText = `
-        position: relative;
-        max-width: 96%;
-        max-height: 94%;
-        object-fit: contain;
-        border-radius: ${CANVAS_CFG.border_radius || 0}px;
-        box-shadow: ${CANVAS_CFG.shadow ? '0 25px 60px rgba(0,0,0,0.5)' : 'none'};
-        z-index: 2;
-        will-change: transform;
-      `;
-    }
+    img.style.cssText = `
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      z-index: 2;
+      will-change: transform;
+    `;
 
     wrap.appendChild(img);
     container.appendChild(wrap);
@@ -183,93 +155,113 @@
     });
   }
 
-  // Deterministic Seek Function: window.__seek(t)
-  window.__seek = function (t) {
-    let activeIdx = 0;
+  // Active seek function called by Playwright renderer & live preview
+  let activeSlideIdx = -1;
+  window.__seek = function (timeInSeconds) {
+    let currentIdx = 0;
     for (let i = 0; i < timeline.length; i++) {
-      if (t >= timeline[i].start) {
-        activeIdx = i;
+      if (timeInSeconds >= timeline[i].start) {
+        currentIdx = i;
       } else {
         break;
       }
     }
 
-    const cur = timeline[activeIdx];
-    const isCut = (cur.transition === 'cut' || FADE_DUR <= 0.05);
+    for (let i = 0; i < slideElements.length; i++) {
+      const el = slideElements[i];
+      const tItem = el.item;
+      const wrap = el.wrap;
+      const img = el.img;
 
-    slideElements.forEach((el, idx) => {
-      if (idx === activeIdx) {
-        if (isCut) {
-          el.wrap.style.opacity = '1.0';
-          el.wrap.style.zIndex = '3';
+      if (i === currentIdx) {
+        const elapsed = timeInSeconds - tItem.start;
+        const dur = Math.max(0.1, tItem.totalDuration);
+        const progress = Math.min(1.0, elapsed / dur);
+
+        // Opacity transition
+        if (FADE_DUR > 0 && elapsed < FADE_DUR) {
+          wrap.style.opacity = (elapsed / FADE_DUR).toFixed(3);
         } else {
-          let opacity = 1.0;
-          if (t < cur.start + FADE_DUR && activeIdx > 0) {
-            opacity = (t - cur.start) / FADE_DUR;
-          }
-          el.wrap.style.opacity = opacity.toFixed(3);
-          el.wrap.style.zIndex = '3';
+          wrap.style.opacity = '1';
         }
 
-        // Ken Burns zoom if configured
+        // Subtle Ken Burns zoom if enabled
         if (KEN_BURNS > 1.0) {
-          const progress = Math.max(0, Math.min(1, (t - cur.start) / Math.max(0.1, cur.totalDuration)));
           const zoom = 1.0 + (KEN_BURNS - 1.0) * progress;
-          el.img.style.transform = `scale(${zoom.toFixed(4)})`;
+          img.style.transform = `scale(${zoom.toFixed(4)})`;
         } else {
-          el.img.style.transform = 'scale(1.0)';
+          img.style.transform = 'scale(1)';
         }
-
-      } else if (!isCut && idx === activeIdx - 1 && t < cur.start + FADE_DUR) {
-        // Crossfade Out for previous slide
-        const fadeOut = 1.0 - ((t - cur.start) / FADE_DUR);
-        el.wrap.style.opacity = Math.max(0, fadeOut).toFixed(3);
-        el.wrap.style.zIndex = '2';
+      } else if (i === currentIdx - 1 && FADE_DUR > 0) {
+        // Crossfade previous slide out
+        const timeSinceNext = timeInSeconds - timeline[currentIdx].start;
+        if (timeSinceNext < FADE_DUR) {
+          wrap.style.opacity = (1.0 - timeSinceNext / FADE_DUR).toFixed(3);
+        } else {
+          wrap.style.opacity = '0';
+        }
       } else {
-        el.wrap.style.opacity = '0';
-        el.wrap.style.zIndex = '1';
+        wrap.style.opacity = '0';
       }
-    });
+    }
+
+    activeSlideIdx = currentIdx;
   };
 
-  // Live browser playback controller
-  window.addEventListener('load', () => {
-    window.__seek(0);
-    const audio = document.getElementById('narration-audio');
-    if (audio) {
-      let isPlaying = false;
-      function tick() {
-        if (!isPlaying) return;
-        window.__seek(audio.currentTime);
-        requestAnimationFrame(tick);
-      }
-      window.addEventListener('click', () => {
-        if (audio.paused) {
-          audio.play().then(() => {
-            isPlaying = true;
-            requestAnimationFrame(tick);
-          }).catch(() => {});
-        } else {
-          audio.pause();
-          isPlaying = false;
-        }
+  // Audio Playback Preview in Browser
+  let audioEl = null;
+  let isPlaying = false;
+  let rafId = null;
+
+  function tick() {
+    if (!isPlaying || !audioEl) return;
+    window.__seek(audioEl.currentTime);
+    rafId = requestAnimationFrame(tick);
+  }
+
+  window.__play = function () {
+    if (!audioEl) {
+      audioEl = new Audio('../voice/mix.wav');
+      audioEl.addEventListener('ended', () => {
+        isPlaying = false;
+        cancelAnimationFrame(rafId);
       });
-      window.addEventListener('keydown', (e) => {
-        if (e.code === 'Space') {
-          e.preventDefault();
-          if (audio.paused) {
-            audio.play().then(() => {
-              isPlaying = true;
-              requestAnimationFrame(tick);
-            });
-          } else {
-            audio.pause();
-            isPlaying = false;
-          }
-        }
+      audioEl.addEventListener('error', () => {
+        audioEl = new Audio('../voice/narration.wav');
+        audioEl.play();
       });
+    }
+    audioEl.play();
+    isPlaying = true;
+    rafId = requestAnimationFrame(tick);
+  };
+
+  window.__pause = function () {
+    if (audioEl) audioEl.pause();
+    isPlaying = false;
+    cancelAnimationFrame(rafId);
+  };
+
+  window.__toggle = function () {
+    if (isPlaying) {
+      window.__pause();
+    } else {
+      window.__play();
+    }
+  };
+
+  // Spacebar toggle playback
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      window.__toggle();
     }
   });
 
-  window.CLOCK = { dur: window.DUR || 30.0 };
+  // Initial seek to frame 0
+  window.__seek(0.0);
+  window.CLOCK = {
+    timeline: timeline,
+    dur: timeline.length ? timeline[timeline.length - 1].end : 30.0
+  };
 })();

@@ -2,21 +2,21 @@
   "editorial_stick_comic": {
     "name": "Editorial Stick-Figure Explainer Comic (Default)",
     "background": "#FBF6EF",
-    "description": "Modern 2D editorial webcomic explainer illustration on a warm off-white cream background (#FBF6EF). Features stylized stick-figure characters with oversized pure white round heads, simple dot eyes, expressive minimalist eyebrows and mouths, rounded bean-shaped torsos, thin black stick limbs, and small oval white hands and feet. Thick, uniform, slightly hand-drawn black ink outlines with rounded line ends. Flat 2D coloring with zero gradients, using muted earthy neutrals for props and furniture, desaturated light gray silhouettes for background crowd figures, and bold solid primary accent colors (red #DC2626, yellow #EAB308, green #16A34A, blue #2563EB) for character shirts or large flat circular halos behind spotlight characters. Minimalist soft oval gray ground shadows underneath characters and objects, expressive comic motion lines, clean comic layout."
+    "description": "Modern 2D editorial webcomic explainer illustration on a warm off-white cream background (#FBF6EF). Features stylized stick-figure characters with oversized pure white round heads, simple dot eyes, expressive minimalist eyebrows and mouths, rounded bean-shaped torsos, thin black stick limbs, and small oval white hands and feet. Thick, uniform, slightly hand-drawn black ink outlines with rounded line ends. Rich stylized 2D environmental background details (subtle room architectural outlines, mid-century bookshelves with books, framed artwork on walls, potted plants, modern floor lamps, clean desks, or soft distant city skylines) drawn in fine black ink lines and filled with muted earthy neutrals (slate gray, soft taupe, olive green, warm wood). Bold solid primary accent colors (red #DC2626, yellow #EAB308, green #16A34A, blue #2563EB) strictly for character shirts or large flat circular halos behind spotlight characters. Flat 2D cel coloring with zero gradients, soft oval gray ground shadows, clean comic layout, centered subject with balanced breathing room."
   },
   "stick_comic_spotlight": {
     "name": "Editorial Stick Comic - Spotlight",
     "background": "#FBF6EF",
-    "description": "Modern 2D editorial stick-figure webcomic illustration on warm off-white cream background (#FBF6EF), thick black ink linework, single main character centered in front of a large flat solid-colored circular halo backdrop (red, yellow, green, or blue). Labeled symbolic props, bold top title, bold bottom caption with colored keyword."
+    "description": "Modern 2D editorial stick-figure webcomic illustration on warm off-white cream background (#FBF6EF), thick black ink linework, single main character centered in front of a large flat solid-colored circular halo backdrop (red, yellow, green, or blue). Detailed stylized background with framed wall art, corner potted plant, labeled symbolic props, bold top title, bold bottom caption with colored keyword."
   },
   "stick_comic_interior": {
-    "name": "Editorial Stick Comic - Interior",
+    "name": "Editorial Stick Comic - Detailed Interior",
     "background": "#FBF6EF",
-    "description": "Modern 2D editorial stick-figure webcomic illustration on warm off-white cream background (#FBF6EF), flat 2D interior room with beige walls, living room sofa, coffee table, laptop showing clear interface, four stick friends in colored shirts interacting, clean flat perspective, thick black outlines."
+    "description": "Modern 2D editorial stick-figure webcomic illustration on warm off-white cream background (#FBF6EF). Stylized flat 2D interior with detailed background elements (bookshelves with neatly stacked colorful books, cozy sofa, geometric rug, wall clock, modern indoor plants, framed certificates, window with city silhouette). Four stick friends in solid colored shirts interacting, clean flat perspective, thick black outlines."
   },
   "stick_comic_group": {
     "name": "Editorial Stick Comic - Group Conflict",
     "background": "#FBF6EF",
-    "description": "Modern 2D editorial stick-figure webcomic illustration on warm off-white cream background (#FBF6EF). Four distinct stick figures in red, yellow, green, and blue shirts pointing or arguing, comic emotion lines, bold top title, bold bottom punchy caption."
+    "description": "Modern 2D editorial stick-figure webcomic illustration on warm off-white cream background (#FBF6EF). Four distinct stick figures in red, yellow, green, and blue shirts pointing or arguing, comic emotion lines, background office or street scene with stylized architectural lines, bold top title, bold bottom punchy caption."
   }
 }

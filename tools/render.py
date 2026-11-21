@@ -1,7 +1,21 @@
-"""High-speed frame-by-frame renderer using Playwright CDP and FFmpeg pipes."""
+"""High-speed frame-by-frame renderer using Playwright CDP and FFmpeg pipes.
+Supports 1920x1080 (laptop / long form) and 720x1600 (phone / short / reel).
+"""
 import asyncio, base64, os, subprocess, tempfile
 from pathlib import Path
 from common import launch_args, run, die, load_json
+
+
+def get_dimensions(fmt):
+    """Resolves width and height for format."""
+    f = str(fmt).lower()
+    if f in ('720:1600', '720x1600', 'phone', 'short', 'reel', 'reels', '9:16'):
+        return 720, 1600
+    if f in ('16:9', '1920:1080', '1920x1080', 'laptop', 'long', 'desktop', 'wide'):
+        return 1920, 1080
+    if f in ('1:1', 'square'):
+        return 1080, 1080
+    return 720, 1600
 
 
 async def open_page(browser, html_path, W, H):
@@ -56,8 +70,8 @@ async def render_slideshow(pdir, out_mp4, fps=60, scale=1.0, crf=16, audio_path=
     from playwright.async_api import async_playwright
     pdir = Path(pdir)
     cfg = load_json(pdir / 'film.json')
-    fmt = cfg.get('format', '16:9')
-    W, H = (1080, 1920) if fmt == '9:16' else (1080, 1080) if fmt == '1:1' else (1920, 1080)
+    fmt = cfg.get('format', '720:1600')
+    W, H = get_dimensions(fmt)
     html_path = pdir / 'build/page.html'
     
     async with async_playwright() as p:
@@ -68,7 +82,7 @@ async def render_slideshow(pdir, out_mp4, fps=60, scale=1.0, crf=16, audio_path=
         
         total_frames = round(dur * fps)
         n_workers = max(1, min(int(os.environ.get('WB_WORKERS', '0')) or max(1, (os.cpu_count() or 4) // 2), 6))
-        print(f"\n[Render] Rendering {total_frames} frames ({dur:.1f}s) at {fps} fps across {n_workers} workers...")
+        print(f"\n[Render] Rendering {total_frames} frames ({dur:.1f}s, {W}x{H}) at {fps} fps across {n_workers} workers...")
         
         with tempfile.TemporaryDirectory(dir=str(pdir / 'build')) as tmp:
             segs, jobs = [], []
@@ -93,7 +107,7 @@ async def render_slideshow(pdir, out_mp4, fps=60, scale=1.0, crf=16, audio_path=
             args += ['-c:v', 'copy', '-movflags', '+faststart', str(out_mp4)]
             run(args)
             
-    print(f"\n[Success] Final Video Rendered: {out_mp4} ({dur:.1f} s)")
+    print(f"\n[Success] Final Video Rendered: {out_mp4} ({dur:.1f} s, {W}x{H})")
 
 
 def export_video(pdir, out_mp4, fps=60, preview=False):

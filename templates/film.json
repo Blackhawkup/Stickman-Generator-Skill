@@ -1,14 +1,24 @@
 {
   "slug": "psychology-explainer",
   "title": "Editorial Stick Comic Explainer",
-  "format": "16:9",
+  "format": "720:1600",
+  "mode": "short",
   "language": "en",
   "theme": {
-    "background": "#F6F4EC",
-    "accent": "#E11D48",
+    "background": "#FBF6EF",
+    "accent": "#DC2626",
     "text_color": "#0F172A",
-    "caption_bg": "rgba(246, 244, 236, 0.92)",
-    "font_family": "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+    "caption_bg": "rgba(251, 246, 239, 0.95)",
+    "font_family": "'Comic Sans MS', 'Comic Neue', cursive, sans-serif"
+  },
+  "canvas": {
+    "aspect_ratio": "720:1600",
+    "width": 720,
+    "height": 1600,
+    "canvas_bg": "#FBF6EF",
+    "border_radius": 0,
+    "shadow": false,
+    "blur_backdrop": false
   },
   "style_preset": "editorial_stick_comic",
   "custom_style_suffix": "",
@@ -18,15 +28,15 @@
     "style": "warm, confident, engaging narrative explainer voice"
   },
   "transitions": {
-    "default_type": "fade",
-    "fade_duration": 0.45,
-    "ken_burns_zoom": 1.04
+    "default_type": "cut",
+    "fade_duration": 0.0,
+    "ken_burns_zoom": 1.0
   },
-  "music": "composed",
-  "music_db": -24,
+  "music": "curious",
+  "music_db": -26,
   "pacing": {
-    "lead": 0.8,
-    "tail": 2.5,
+    "lead": 0.0,
+    "tail": 0.5,
     "pauses": []
   }
 }
