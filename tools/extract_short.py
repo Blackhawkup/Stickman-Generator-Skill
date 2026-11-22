@@ -3,9 +3,14 @@ Automatically extracts the opening ~1 minute hook from a 10-minute long-form exp
 and renders a vertical 720x1600 60fps Short (out/<slug>-short.mp4) formatted for phone/reels
 with seamless warm cream background (#FBF6EF) fill.
 """
-import asyncio, json, os, shutil, subprocess
+import asyncio, json, os, shutil, subprocess, sys
 from pathlib import Path
-from common import load_json, save_json, run, probe_duration, ENGINE_DIR, die
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    from common import load_json, save_json, run, probe_duration, ENGINE_DIR, die
+except ImportError:
+    from tools.common import load_json, save_json, run, probe_duration, ENGINE_DIR, die
 from render import render_slideshow
 
 

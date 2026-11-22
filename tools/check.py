@@ -3,8 +3,14 @@ Enforces the retention pacing rule:
 - Mostly 3 seconds, sometimes 2 seconds (range 1.8s - 3.8s, target average ~2.8s - 3.2s)
 - Long-form deep dive (after 2 minutes): 5.0s to 6.0s (hard cap <= 6.0s)
 """
+import sys
 from pathlib import Path
-from common import load_json, probe_duration
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    from common import load_json, probe_duration
+except ImportError:
+    from tools.common import load_json, probe_duration
 
 
 def check_project(pdir):

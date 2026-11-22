@@ -1,9 +1,14 @@
 """High-speed frame-by-frame renderer using Playwright CDP and FFmpeg pipes.
 Supports 1920x1080 (laptop / long form) and 720x1600 (phone / short / reel).
 """
-import asyncio, base64, os, subprocess, tempfile
+import asyncio, base64, os, subprocess, sys, tempfile
 from pathlib import Path
-from common import launch_args, run, die, load_json
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    from common import launch_args, run, die, load_json
+except ImportError:
+    from tools.common import launch_args, run, die, load_json
 
 
 def get_dimensions(fmt):

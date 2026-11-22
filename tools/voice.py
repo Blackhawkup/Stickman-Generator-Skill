@@ -3,7 +3,12 @@ import base64, json, os, re, sys, urllib.error, urllib.request, wave
 from difflib import SequenceMatcher
 from pathlib import Path
 import numpy as np
-from common import ffmpeg, load_json, save_json, norm, probe_duration, run, die
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    from common import ffmpeg, load_json, save_json, norm, probe_duration, run, die
+except ImportError:
+    from tools.common import ffmpeg, load_json, save_json, norm, probe_duration, run, die
 
 SR = 48000
 TTS_MODEL = 'gemini-2.5-flash-preview-tts'

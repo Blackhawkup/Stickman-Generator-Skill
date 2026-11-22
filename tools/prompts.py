@@ -5,8 +5,14 @@ Supports:
 - Dedicated 1920x1080 high-CTR YouTube thumbnail prompt in the same art style
 - Rich stylized 2D background details (furniture, bookshelves, indoor plants, architectural lines)
 """
+import sys
 from pathlib import Path
-from common import load_json, save_json, PROMPTS_DIR, die
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    from common import load_json, save_json, PROMPTS_DIR, die
+except ImportError:
+    from tools.common import load_json, save_json, PROMPTS_DIR, die
 
 
 def build_prompts(project_dir):

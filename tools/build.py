@@ -2,9 +2,14 @@
 Supports 1920x1080 (laptop / long form) and 720x1600 (phone / short / reel) with centered canvas
 and matching warm off-white cream (#FBF6EF) background fill.
 """
-import json, shutil
+import json, shutil, sys
 from pathlib import Path
-from common import load_json, save_json, ENGINE_DIR, die
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    from common import load_json, save_json, ENGINE_DIR, die
+except ImportError:
+    from tools.common import load_json, save_json, ENGINE_DIR, die
 
 
 def get_dimensions(fmt):
