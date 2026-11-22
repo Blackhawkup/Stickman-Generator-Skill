@@ -3,19 +3,19 @@
 This file defines the exact prompt formula and visual DNA used when generating slide images in the **Editorial Stick-Figure Explainer Comic** style through the Google Flow MCP server (`flow_agent_images`).
 
 Supports:
-- **Phone / Short / Reel**: Native **9:16** full-height vertical canvas (large prominent characters, filling mobile screen)
+- **Phone / Short / Reel**: **1024 x 1024** (1:1 square aspect ratio) centered on the 720x1600 mobile canvas with matching warm cream (#FBF6EF) fill
 - **Laptop / Long-Form**: **1920 x 1080** (16:9 widescreen with rich 2D background details)
-- **Companion Short (from Long-Form)**: Generated as **SEPARATE 9:16 vertical images** (`short_slide_*.png`)
+- **Companion Short (from Long-Form)**: Generated as **SEPARATE 1024 x 1024 square images** (`short_slide_*.png`)
 - **Long-Form Thumbnail**: **1920 x 1080** (clickable high-CTR YouTube thumbnail featuring the topic name)
 
 ---
 
 ## The Prompt Formulas
 
-### 1. Phone / Short / Reel Formula (Native 9:16 Full-Height Vertical Canvas)
-Used for vertical explainer shorts on phone screens (native 9:16 aspect ratio) with large prominent characters occupying the tall vertical space:
+### 1. Phone / Short / Reel Formula (1024 x 1024 Square 1:1 Composition)
+Used for explainer shorts on phone screens (1024x1024 1:1 aspect ratio) centered on the 720x1600 mobile viewport with large prominent characters:
 ```text
-Modern 2D editorial webcomic explainer illustration on a warm off-white cream background (#FBF6EF). Vertical 9:16 full-screen portrait composition filling the tall mobile canvas. At the top center, bold black comic book title: "{top_title}". In the tall vertical center composition: {subject} with large prominent expressive characters filling the vertical space. At the bottom center, bold comic book caption: "{bottom_caption}". Rich stylized 2D vertical background details (tall mid-century wooden bookshelf with colorful books, hanging potted indoor plants, framed wall pictures, stylish floor lamp, cozy desk setup) drawn in fine black ink lines and muted earthy neutrals. Stylized stick-figure characters with large oversized round white heads, clear expressive dot eyes and thick eyebrows, thin black stick limbs, wearing solid bold primary color shirts (red #DC2626, yellow #EAB308, green #16A34A, blue #2563EB). Large dynamic figures positioned prominently in the vertical frame, thick uniform black ink outlines on characters, flat 2D coloring with zero gradients, soft gray ground shadows, clean comic typography, crisp bold lines, full vertical framing filling the screen without feeling cramped or shrunken, centered subject seamlessly blending into the warm cream background fill.
+Modern 2D editorial webcomic explainer illustration on a warm off-white cream background (#FBF6EF). 1024x1024 square 1:1 composition centered on the frame. At the top center, bold black comic book title: "{top_title}". In the center composition: {subject} with large prominent expressive characters. At the bottom center, bold comic book caption: "{bottom_caption}". Rich stylized 2D background details (mid-century wooden bookshelf with colorful books, hanging potted indoor plants, framed wall pictures, stylish floor lamp, cozy desk setup) drawn in fine black ink lines and muted earthy neutrals. Stylized stick-figure characters with large oversized round white heads, clear expressive dot eyes and thick eyebrows, thin black stick limbs, wearing solid bold primary color shirts (red #DC2626, yellow #EAB308, green #16A34A, blue #2563EB). Large dynamic figures positioned prominently in the square frame, thick uniform black ink outlines on characters, flat 2D coloring with zero gradients, soft gray ground shadows, clean comic typography, crisp bold lines, 1024x1024 1:1 square aspect ratio, centered subject seamlessly blending into the warm cream background fill.
 ```
 
 ### 2. Laptop / Long-Form Formula (1920 x 1080 Canvas)

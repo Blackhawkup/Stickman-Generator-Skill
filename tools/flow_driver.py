@@ -3,10 +3,11 @@ import asyncio, json, os, time
 from pathlib import Path
 from playwright.async_api import async_playwright
 
-async def set_composer(page, aspect_ratio="9:16"):
+async def set_composer(page, aspect_ratio="1:1"):
     btn = page.locator('button.settings-trigger-button').first
     text = await btn.inner_text()
-    if '9:16' not in text:
+    target_label = "1:1" if aspect_ratio == "1:1" else ("16:9" if aspect_ratio == "16:9" else aspect_ratio)
+    if target_label not in text:
         await btn.click()
         await asyncio.sleep(0.5)
         # Click Image if visible
@@ -14,8 +15,8 @@ async def set_composer(page, aspect_ratio="9:16"):
         if await img_opt.is_visible():
             await img_opt.click()
             await asyncio.sleep(0.3)
-        # Click 9:16
-        ar_opt = page.locator('button:has-text("9:16"), [role="menuitem"]:has-text("9:16")').first
+        # Click target aspect ratio
+        ar_opt = page.locator(f'button:has-text("{target_label}"), [role="menuitem"]:has-text("{target_label}")').first
         if await ar_opt.is_visible():
             await ar_opt.click()
             await asyncio.sleep(0.3)

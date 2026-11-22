@@ -30,7 +30,7 @@ Total Storyboard Size: ~105 to 130 slides for a 10-minute video.
 
 ## 🎯 Companion Short Flagging & Thumbnail
 
-1. **Companion Short**: Slides 1 to ~22 (the first minute) automatically form the 720x1600 vertical companion short (`out/<slug>-short.mp4`). Tag with `"short_candidate": true`.
+1. **Companion Short**: Slides 1 to ~22 (the first minute) automatically form the 720x1600 vertical companion short (`out/<slug>-short.mp4`) using dedicated 1024x1024 square images. Tag with `"short_candidate": true`.
 2. **1920x1080 YouTube Thumbnail**: Automatically generated in the same editorial stick-figure comic style, featuring the large topic name across the top and a dramatic visual scene with rich background details.
 
 ---

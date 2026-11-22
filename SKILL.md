@@ -102,18 +102,18 @@ For every long-format video, a dedicated 1920x1080 YouTube thumbnail **MUST ALWA
 
 ---
 
-## 🎨 Visual DNA, Canvas & Separate Short Images
+## 🎨 Visual DNA, Canvas & 1024x1024 Short Images
 
-### 1. Canvas Dimensions & Dedicated Vertical 9:16 Generation
-| Mode | Canvas Dimensions | Layout & Background Fill | Flow Aspect Ratio |
+### 1. Canvas Dimensions & Dedicated 1024x1024 Square Generation
+| Mode | Video Canvas Dimensions | Image Resolution & Aspect Ratio | Layout & Background Fill |
 |---|---|---|---|
-| **Phone / Short / Reel** | **720 x 1600** (Vertical) | Native 9:16 full-height composition; warm cream (`#FBF6EF`) fill | `9:16` (Full Height) |
-| **Companion Short (Long-Form)** | **720 x 1600** (Vertical) | Generated **SEPARATELY** as dedicated 9:16 vertical images (`short_slide_*.png`) | `9:16` (Full Height) |
-| **Laptop / Long-Form** | **1920 x 1080** (Widescreen 16:9) | Full 16:9 cinematic framing with warm cream (`#FBF6EF`) | `16:9` |
-| **YouTube Thumbnail** | **1920 x 1080** (Widescreen 16:9) | High-contrast dramatic thumbnail with large topic title | `16:9` |
+| **Phone / Short / Reel** | **720 x 1600** (Vertical) | **1024 x 1024** (`1:1` Square) | Centered 1024x1024 artwork; warm cream (`#FBF6EF`) seamless fill |
+| **Companion Short (Long-Form)** | **720 x 1600** (Vertical) | **1024 x 1024** (`1:1` Square) | Generated **SEPARATELY** as dedicated 1024x1024 square images (`short_slide_*.png`) |
+| **Laptop / Long-Form** | **1920 x 1080** (Widescreen 16:9) | **1920 x 1080** (`16:9` Landscape) | Full 16:9 cinematic framing with warm cream (`#FBF6EF`) |
+| **YouTube Thumbnail** | **1920 x 1080** (Widescreen 16:9) | **1920 x 1080** (`16:9` Landscape) | High-contrast dramatic thumbnail with large topic title |
 
 > [!IMPORTANT]
-> **No Small Images in Shorts**: All short images are generated in native **9:16 vertical** aspect ratio with large, prominent characters occupying the tall frame. In long-form projects, the companion short NEVER reuses the 16:9 widescreen images; separate vertical 9:16 images are generated specifically for the short. Zero small images, zero black bars.
+> **1024x1024 Images in Shorts**: All short images (and companion short images) are generated at **1024x1024** (`1:1` square aspect ratio). In the 720x1600 mobile viewport, the image sits prominently in the center, and the top and bottom canvas seamlessly fill with the exact matching background cream color (`#FBF6EF`). In long-form projects, the companion short NEVER reuses the 16:9 widescreen images; separate 1024x1024 square images are generated specifically for the short. Zero distorted images, zero black bars.
 
 ### 2. Slide 01 Opening Rule (Title Card)
 - **Slide 01** is the viewer's very first impression. It MUST be a compelling, high-CTR **Title Card**.

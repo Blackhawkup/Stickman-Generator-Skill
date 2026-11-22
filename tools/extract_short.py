@@ -134,7 +134,7 @@ def extract_short(pdir, out_short_mp4=None, max_duration=65.0):
         short_img_path = pdir / 'images' / short_img_name
         if short_img_path.exists():
             s_copy['src'] = f"../images/{short_img_name}"
-            print(f" -> Companion Short using dedicated 9:16 vertical image: {short_img_name}")
+            print(f" -> Companion Short using dedicated 1024x1024 square image: {short_img_name}")
         else:
             s_copy['src'] = f"../images/{s['name']}.png"
         short_slides_built.append(s_copy)

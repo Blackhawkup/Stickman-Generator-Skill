@@ -46,8 +46,9 @@ Slide Duration Guidelines:
 1. **Start with the Name of the Law First (CRITICAL)**:
    - **Slide 01**: The video MUST start with the Name of the Law / Concept (e.g. `trigger: "the pratfall effect"` or `"the sunk cost fallacy"`). Displays the high-CTR Title Card while the narrator speaks the name.
    - **Slide 02**: The scenario begins with `"Imagine..."` (e.g. `trigger: "imagine a brilliant speaker"` or `"imagine you buy"`).
-2. **Native 9:16 Full-Height Composition (Large Prominent Figures)**:
-   - Generated in native **9:16 vertical** aspect ratio with large, prominent stick figures filling the tall mobile canvas.
+2. **1024x1024 (1:1 Square) Image Composition (Large Prominent Figures)**:
+   - Generated as **1024x1024** square images (1:1 aspect ratio) with large, prominent stick figures filling the frame.
+   - Displayed centered on the 720x1600 mobile phone canvas with matching warm cream (`#FBF6EF`) background fill.
    - Characters and props must be large, bold, and expressive (never tiny, shrunken, or floating in empty space).
 3. **Pacing Balance**: Keep most slides at **~3 seconds**, using **~2 seconds** selectively for quick surprise beats, sudden realizations, or punchy text reveals.
 4. **Acoustic Trigger Matching**: Every `trigger` must be an exact 2–5 word phrase verbatim from `script.md`.

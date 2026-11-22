@@ -8,10 +8,10 @@ Designed to run in any directory, generating finished deliverables (videos, soci
 
 ## ⚡ Key Highlights
 
-- **⚡ Dual Video Formats & Dedicated Separate Short Images**:
-  - **Phone / Short / Reel (720 x 1600)**: Native **9:16 vertical full-height artwork** with large, prominent characters filling the mobile canvas. Zero small images, zero black bars.
+- **⚡ Dual Video Formats & Dedicated 1024x1024 Short Images**:
+  - **Phone / Short / Reel (720 x 1600)**: **1024x1024 square images (1:1)** positioned in the center with matching warm cream (`#FBF6EF`) background fill. Large, prominent characters, zero black bars.
   - **Laptop / Long-Form (1920 x 1080)**: 16:9 widescreen cinematic framing with rich 2D environmental details.
-  - **Separate Short Images**: In long-form projects, the companion short **generates its own dedicated 9:16 vertical images** (`short_slide_*.png`), never reusing or letterboxing 16:9 widescreen images!
+  - **Separate Short Images**: In long-form projects, the companion short **generates its own dedicated 1024x1024 square images** (`short_slide_*.png`), never reusing or letterboxing 16:9 widescreen images!
 - **🚨 Mandatory Hook Formula (Name First, Then Imagine)**:
   - **Sentence 1**: Spoken uppercase name of the law/phenomenon (e.g., `THE PRATFALL EFFECT.` or `THE SUNK COST FALLACY.`). The video and narration start with the name!
   - **Sentence 2**: Immediately follows with the scenario starting with `"Imagine a guy..."`, `"Imagine you..."`, or `"Imagine if you..."`.
