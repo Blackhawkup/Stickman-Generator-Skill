@@ -62,11 +62,17 @@ Total Storyboard Size: ~105 to 130 slides for a 10-minute video.
 
 ## Storyboard Rules for Long-Form
 
-1. **Acoustic Trigger Matching**: Every `trigger` must be an exact 2–5 word phrase verbatim from `script.md`.
-2. **First Minute Rhythm**: Mostly ~3s, sometimes ~2s. Never allow slides to drag past 3.8s or flash faster than 1.8s.
-3. **Rich 2D Background Environments**: In every slide, include environmental details (bookshelves, framed artwork, potted plants, architectural outlines, office chalkboards, city skylines) drawn in fine black ink lines.
-4. **Widescreen Centering**: Composed for 1920x1080, centered with warm cream (`#FBF6EF`) background fill.
-5. **Slide 01 Hook Visual Rule (CRITICAL)**:
+1. **Start with the Name of the Law First (CRITICAL)**:
+   - **Slide 01**: The video MUST start with the Name of the Law / Concept (e.g. `trigger: "the pratfall effect"` or `"the sunk cost fallacy"`). Displays the Title Card while the narrator speaks the name.
+   - **Slide 02**: The scenario begins with `"Imagine..."` (e.g. `trigger: "imagine a brilliant speaker"`).
+2. **Dedicated Separate 9:16 Vertical Images for Companion Short**:
+   - The opening ~1 minute hook slides (marked `short_candidate: true`) automatically have **separate vertical 9:16 images** generated (`short_slide_*.png`).
+   - The companion short NEVER reuses the 16:9 widescreen images; it renders using native 9:16 full-height artwork with large prominent characters!
+3. **Acoustic Trigger Matching**: Every `trigger` must be an exact 2–5 word phrase verbatim from `script.md`.
+4. **First Minute Rhythm**: Mostly ~3s, sometimes ~2s. Never allow slides to drag past 3.8s or flash faster than 1.8s.
+5. **Rich 2D Background Environments**: In every slide, include environmental details (bookshelves, framed artwork, potted plants, architectural outlines, office chalkboards, city skylines) drawn in fine black ink lines.
+6. **Widescreen Centering**: Composed for 1920x1080 widescreen, centered with warm cream (`#FBF6EF`) background fill.
+7. **Slide 01 Hook Visual Rule (CRITICAL)**:
    - Slide 01 is the viewer's very first impression. It MUST be a compelling, high-CTR **Title Card**.
    - `top_title`: Exact phenomenon name in uppercase.
    - `bottom_caption`: 1 punchy hook subtitle (e.g., `WHY FLAWS MAKE US LIKEABLE.`, `WHY WE CAN'T QUIT BAD DECISIONS.`).

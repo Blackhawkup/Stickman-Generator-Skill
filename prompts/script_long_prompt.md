@@ -15,28 +15,33 @@ Write an in-depth, spoken narration script for a 10-minute timed visual explaine
 
 ---
 
-## 🚨 MANDATORY HOOK ARCHITECTURE (NON-NEGOTIABLE)
+## 🚨 MANDATORY OPENING ARCHITECTURE: NAME FIRST, THEN IMAGINE (NON-NEGOTIABLE)
 
-The opening minute MUST begin with this EXACT 2-part formula:
+The opening minute and spoken video MUST start with the NAME of the law or concept, NOT the hypothetical scenario.
+The sequence is strictly: **NAME OF THE THING FIRST, THEN THE IMAGINE PART**.
 
-### 1. Sentence 1: The Topic Title (One Short Sentence)
-Name the exact phenomenon in uppercase followed by a period.
-- Examples:
-  * `THE PRATFALL EFFECT.`
-  * `THE SUNK COST FALLACY.`
-  * `THE SPOTLIGHT EFFECT.`
+### 1. Sentence 1: The Name of the Law / Thing (The VERY FIRST Words Spoken)
+The narrator speaks the exact name of the phenomenon in UPPERCASE followed by a period:
+- `THE PRATFALL EFFECT.`
+- `THE SUNK COST FALLACY.`
+- `PARKINSON'S LAW.`
+- `THE SPOTLIGHT EFFECT.`
+- `THE DUNNING-KRUGER EFFECT.`
 
-### 2. Sentence 2: The Direct "Imagine..." Viewer Immersion
-The VERY NEXT sentence MUST begin with the word **"Imagine"**:
+*Crucial*: The narrator MUST speak this name out loud as the very first sentence. Do NOT start with "Imagine" on sentence 1. The viewer and video start with the name.
+
+### 2. Sentence 2: The Direct "Imagine..." Viewer Immersion (The Scenario Begins)
+Immediately AFTER the name is stated, the very next sentence begins the scenario with **"Imagine"**:
 - **"Imagine a guy..."** (e.g., *"Imagine a brilliant speaker in a sharp suit walks onto a stage, delivers a flawless presentation, and then spills hot coffee all over his shirt."*)
 - **"Imagine you..."** (e.g., *"Imagine you buy a forty-dollar ticket to a movie, and thirty minutes in, it's completely unwatchable."*)
 - **"Imagine if you..."** (e.g., *"Imagine if you spend three months preparing for a meeting, convinced everyone is watching your every move."*)
 
 ### ❌ STRICT NEGATIVE CONSTRAINTS (DO NOT VIOLATE):
+- **NEVER start the video with "Imagine..." before stating the name of the law.** The name MUST be spoken first.
 - **NEVER use named fiction characters** like *"Leo walked into the office..."*, *"David was a software engineer..."*, or *"Sarah opened her laptop..."*.
-- **NEVER start with creator filler** like *"Hey everyone, welcome back"* or rhetorical questions without "Imagine".
-- The first two sentences MUST ALWAYS be:
-  `[TOPIC TITLE]. Imagine [a guy / you / if you]...`
+- **NEVER save the name of the law for the middle or end of the video.**
+- The opening structure is ALWAYS:
+  `[NAME OF THE LAW]. Imagine [a guy / you / if you]...`
 
 ---
 

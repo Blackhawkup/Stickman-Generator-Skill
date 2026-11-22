@@ -43,11 +43,16 @@ Slide Duration Guidelines:
 
 ## Rules for Slide Generation
 
-1. **Pacing Balance**: Keep most slides at **~3 seconds**, using **~2 seconds** selectively for quick surprise beats, sudden realizations, or punchy text reveals.
-2. **Acoustic Trigger Matching**: Every `trigger` must be an exact 2–5 word phrase verbatim from `script.md`.
-3. **Rich 2D Background**: Include environmental cues in `subject` (e.g. bookshelves, framed art, plants, desks, city windows).
-4. **Resolution**: Outputs at **720x1600** for phone/reels, centered with warm cream (`#FBF6EF`) background fill.
-5. **Slide 01 Hook Visual Rule (CRITICAL)**:
+1. **Start with the Name of the Law First (CRITICAL)**:
+   - **Slide 01**: The video MUST start with the Name of the Law / Concept (e.g. `trigger: "the pratfall effect"` or `"the sunk cost fallacy"`). Displays the high-CTR Title Card while the narrator speaks the name.
+   - **Slide 02**: The scenario begins with `"Imagine..."` (e.g. `trigger: "imagine a brilliant speaker"` or `"imagine you buy"`).
+2. **Native 9:16 Full-Height Composition (Large Prominent Figures)**:
+   - Generated in native **9:16 vertical** aspect ratio with large, prominent stick figures filling the tall mobile canvas.
+   - Characters and props must be large, bold, and expressive (never tiny, shrunken, or floating in empty space).
+3. **Pacing Balance**: Keep most slides at **~3 seconds**, using **~2 seconds** selectively for quick surprise beats, sudden realizations, or punchy text reveals.
+4. **Acoustic Trigger Matching**: Every `trigger` must be an exact 2–5 word phrase verbatim from `script.md`.
+5. **Rich 2D Background Details**: Include environmental cues in `subject` (tall bookshelves, hanging plants, framed art, modern desks, floor lamps).
+6. **Slide 01 Hook Title Card Rule**:
    - Slide 01 is the viewer's very first impression. It MUST be a compelling, high-CTR **Title Card**.
    - `top_title`: Exact phenomenon name in uppercase.
    - `bottom_caption`: 1 punchy hook subtitle (e.g., `WHY FLAWS MAKE US LIKEABLE.`, `WHY WE CAN'T QUIT BAD DECISIONS.`).

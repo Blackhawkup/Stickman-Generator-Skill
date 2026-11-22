@@ -8,13 +8,14 @@ Designed to run in any directory, generating finished deliverables (videos, soci
 
 ## ⚡ Key Highlights
 
-- **⚡ Dual Video Formats**:
-  - **Phone / Short / Reel (720 x 1600)**: Centered artwork with matching warm cream (`#FBF6EF`) background fill. Zero black bars.
+- **⚡ Dual Video Formats & Dedicated Separate Short Images**:
+  - **Phone / Short / Reel (720 x 1600)**: Native **9:16 vertical full-height artwork** with large, prominent characters filling the mobile canvas. Zero small images, zero black bars.
   - **Laptop / Long-Form (1920 x 1080)**: 16:9 widescreen cinematic framing with rich 2D environmental details.
-- **🚨 Mandatory Hook Formula**:
-  - **Sentence 1**: Uppercase Topic Title (e.g., `THE PRATFALL EFFECT.`).
-  - **Sentence 2**: MUST start with `"Imagine a guy..."`, `"Imagine you..."`, or `"Imagine if you..."`.
-  - **Negative Constraint**: Zero named fictional characters (banned: *"Leo walked into the office..."*).
+  - **Separate Short Images**: In long-form projects, the companion short **generates its own dedicated 9:16 vertical images** (`short_slide_*.png`), never reusing or letterboxing 16:9 widescreen images!
+- **🚨 Mandatory Hook Formula (Name First, Then Imagine)**:
+  - **Sentence 1**: Spoken uppercase name of the law/phenomenon (e.g., `THE PRATFALL EFFECT.` or `THE SUNK COST FALLACY.`). The video and narration start with the name!
+  - **Sentence 2**: Immediately follows with the scenario starting with `"Imagine a guy..."`, `"Imagine you..."`, or `"Imagine if you..."`.
+  - **Negative Constraint**: Zero named fictional characters (banned: *"Leo walked into the office..."*). Never start with "Imagine" before stating the name.
 - **⏱️ High-Retention Pacing (Mostly 3s, Sometimes 2s)**:
   - Slides stay on screen for mostly **~3.0 seconds**, dipping to **~2.0 seconds** for fast surprise beats or punchlines (target average ~2.8s–3.2s).
   - In long-form after 2 minutes, slides stay on screen for **5.0 to 6.0 seconds** for deep exposition.

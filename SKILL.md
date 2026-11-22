@@ -25,14 +25,26 @@ Activate this skill when:
 
 ---
 
-## 🚨 Mandatory Hook Architecture (Non-Negotiable)
+## 🚨 Mandatory Opening Architecture: Name First, Then Imagine (Non-Negotiable)
 
-Every script (both Short and Long-Form) MUST start with this EXACT 2-sentence opening:
-1. **Sentence 1**: The Topic Title in uppercase followed by a period (e.g. `THE PRATFALL EFFECT.` or `THE SUNK COST FALLACY.`).
-2. **Sentence 2**: MUST start with `"Imagine a guy..."`, `"Imagine you..."`, or `"Imagine if you..."`:
+The video and spoken narration MUST start with the NAME of the law or concept, NOT the hypothetical scenario.
+The sequence is strictly: **NAME OF THE THING FIRST, THEN THE IMAGINE PART**.
+
+1. **Sentence 1 (The VERY FIRST Words Spoken)**:
+   The narrator speaks the exact name of the law/phenomenon in UPPERCASE followed by a period:
+   - `THE PRATFALL EFFECT.`
+   - `THE SUNK COST FALLACY.`
+   - `PARKINSON'S LAW.`
+   - `THE SPOTLIGHT EFFECT.`
+   *Crucial*: The narrator MUST speak this name out loud as the very first sentence. The video starts with the Title Card displaying this name.
+2. **Sentence 2 (The VERY NEXT Words Spoken - Scenario Begins)**:
+   Immediately AFTER the name is stated, the very next sentence begins the scenario with **"Imagine"**:
    - *"Imagine a brilliant speaker in a sharp suit walks onto a stage, delivers a flawless presentation, and then spills hot coffee all over his shirt."*
-   - *"Imagine you buy a forty-dollar ticket to a movie, and thirty minutes in, it's completely unwatchable."*
-3. **STRICT NEGATIVE CONSTRAINT**: NEVER start with fictional character names (e.g. *"Leo walked into the office..."*, *"David was a manager..."*). NEVER start with creator filler like *"Hey guys"* or unrelated rhetorical questions.
+   - *"Imagine you buy a forty-dollar ticket to a movie, and twenty minutes in, it's completely unwatchable."*
+3. **STRICT NEGATIVE CONSTRAINTS**:
+   - NEVER start the video with "Imagine..." before stating the name of the law.
+   - NEVER use named fiction characters (e.g. *"Leo walked into the office..."*, *"David was a manager..."*).
+   - NEVER save the name of the law for the middle or end of the video.
 
 ---
 
@@ -61,17 +73,18 @@ Never repeat the same background music track across videos:
 
 ---
 
-## 🎨 Visual DNA, Canvas & Centering
+## 🎨 Visual DNA, Canvas & Separate Short Images
 
-### 1. Canvas Dimensions & Zero Black Bars
+### 1. Canvas Dimensions & Dedicated Vertical 9:16 Generation
 | Mode | Canvas Dimensions | Layout & Background Fill | Flow Aspect Ratio |
 |---|---|---|---|
-| **Phone / Short / Reel** | **720 x 1600** (Vertical) | Centered artwork; entire screen filled with warm cream (`#FBF6EF`) | `1:1` (Centered) |
+| **Phone / Short / Reel** | **720 x 1600** (Vertical) | Native 9:16 full-height composition; warm cream (`#FBF6EF`) fill | `9:16` (Full Height) |
+| **Companion Short (Long-Form)** | **720 x 1600** (Vertical) | Generated **SEPARATELY** as dedicated 9:16 vertical images (`short_slide_*.png`) | `9:16` (Full Height) |
 | **Laptop / Long-Form** | **1920 x 1080** (Widescreen 16:9) | Full 16:9 cinematic framing with warm cream (`#FBF6EF`) | `16:9` |
 | **YouTube Thumbnail** | **1920 x 1080** (Widescreen 16:9) | High-contrast dramatic thumbnail with large topic title | `16:9` |
 
 > [!IMPORTANT]
-> The image stays in the center and the entire rest of the frame is filled with the exact same warm cream background color (`#FBF6EF`). Zero black bars, zero harsh borders.
+> **No Small Images in Shorts**: All short images are generated in native **9:16 vertical** aspect ratio with large, prominent characters occupying the tall frame. In long-form projects, the companion short NEVER reuses the 16:9 widescreen images; separate vertical 9:16 images are generated specifically for the short. Zero small images, zero black bars.
 
 ### 2. Slide 01 Opening Rule (Title Card)
 - **Slide 01** is the viewer's very first impression. It MUST be a compelling, high-CTR **Title Card**.

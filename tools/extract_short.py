@@ -121,8 +121,21 @@ def extract_short(pdir, out_short_mp4=None, max_duration=65.0):
         },
         'transitions': {'default_type': 'cut', 'fade_duration': 0.0, 'ken_burns_zoom': 1.0}
     }
+    # Dedicated separate 9:16 vertical images for companion short
+    short_slides_built = []
+    for s in short_slides:
+        s_copy = dict(s)
+        short_img_name = f"short_{s['name']}.png"
+        short_img_path = pdir / 'images' / short_img_name
+        if short_img_path.exists():
+            s_copy['src'] = f"../images/{short_img_name}"
+            print(f" -> Companion Short using dedicated 9:16 vertical image: {short_img_name}")
+        else:
+            s_copy['src'] = f"../images/{s['name']}.png"
+        short_slides_built.append(s_copy)
+
     (bdir / 'film_short.js').write_text(f"window.FILM = {json.dumps(short_film, indent=2)};\n", encoding='utf-8')
-    (bdir / 'slides_short.js').write_text(f"window.SLIDES = {json.dumps(short_slides, indent=2)};\n", encoding='utf-8')
+    (bdir / 'slides_short.js').write_text(f"window.SLIDES = {json.dumps(short_slides_built, indent=2)};\n", encoding='utf-8')
 
     # Filter words for the short duration
     short_words = [w for w in words if w.get('e', 0.0) <= short_dur + 0.5]

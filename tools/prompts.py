@@ -49,22 +49,22 @@ def build_prompts(project_dir):
             )
             aspect_ratio = "16:9"
         else:
-            # 720x1600 Phone / Short / Reel formula
+            # Native 9:16 Full-Height Vertical formula for Phone / Short / Reel (Large prominent characters)
             prompt_parts = [
                 f"Modern 2D editorial webcomic explainer illustration on a warm off-white cream background ({bg_color}).",
-                "Vertical composition centered on warm cream parchment background (#FBF6EF)."
+                "Vertical 9:16 full-screen portrait composition filling the tall mobile canvas."
             ]
             if top_title:
                 prompt_parts.append(f'At the top center, bold black comic book title: "{top_title}".')
-            prompt_parts.append(f"In the center: {subject}.")
+            prompt_parts.append(f"In the tall vertical center composition: {subject} with large prominent expressive characters filling the vertical space.")
             if bottom_caption:
                 prompt_parts.append(f'At the bottom center, bold comic book caption: "{bottom_caption}".')
             prompt_parts.append(
-                f"Rich stylized 2D background details (cozy room interior, detailed bookshelf, framed wall pictures, potted indoor plants, stylish floor lamp, or desk setup) drawn in fine black ink lines and muted earthy neutrals. "
-                f"Stylized stick-figure characters with oversized round white heads, dot eyes, expressive eyebrows, thin black stick limbs, wearing solid bold primary color shirts (red #DC2626, yellow #EAB308, green #16A34A, blue #2563EB). "
-                f"Thick uniform black ink outlines on characters, flat 2D coloring with zero gradients, soft gray ground shadows, clean comic typography, crisp lines, centered subject seamlessly blending into the warm cream background fill."
+                f"Rich stylized 2D vertical background details (tall mid-century wooden bookshelf with colorful books, hanging potted indoor plants, framed wall pictures, stylish floor lamp, cozy desk setup) drawn in fine black ink lines and muted earthy neutrals. "
+                f"Stylized stick-figure characters with large oversized round white heads, clear expressive dot eyes and thick eyebrows, thin black stick limbs, wearing solid bold primary color shirts (red #DC2626, yellow #EAB308, green #16A34A, blue #2563EB). "
+                f"Large dynamic figures positioned prominently in the vertical frame, thick uniform black ink outlines on characters, flat 2D coloring with zero gradients, soft gray ground shadows, clean comic typography, crisp bold lines, full vertical framing filling the screen without feeling cramped or shrunken, centered subject seamlessly blending into the warm cream background fill."
             )
-            aspect_ratio = "1:1"  # Generated centered, displays seamlessly in 720x1600 frame
+            aspect_ratio = "9:16"  # Generated as native 9:16 vertical full-height
 
         prompt = " ".join(prompt_parts)
         
@@ -79,6 +79,45 @@ def build_prompts(project_dir):
             'short_candidate': s.get('short_candidate', False)
         })
         
+    # If Long-Form: generate SEPARATE vertical 9:16 images for the companion Short!
+    if is_long:
+        short_candidates = [s for s in slides if s.get('short_candidate') is True]
+        if not short_candidates:
+            short_candidates = slides[:min(25, len(slides))]
+            
+        print(f" -> Generating separate vertical 9:16 prompts for {len(short_candidates)} companion Short slides...")
+        for s in short_candidates:
+            short_name = f"short_{s['name']}"
+            subject = s.get('subject', '').strip().rstrip('.')
+            top_title = s.get('top_title', project_title)
+            bottom_caption = s.get('bottom_caption', s.get('caption', ''))
+            
+            short_prompt_parts = [
+                f"Modern 2D editorial webcomic explainer illustration on a warm off-white cream background ({bg_color}).",
+                "Vertical 9:16 full-screen portrait composition filling the tall mobile canvas."
+            ]
+            if top_title:
+                short_prompt_parts.append(f'At the top center, bold black comic book title: "{top_title}".')
+            short_prompt_parts.append(f"In the tall vertical center composition: {subject} with large prominent expressive characters filling the vertical space.")
+            if bottom_caption:
+                short_prompt_parts.append(f'At the bottom center, bold comic book caption: "{bottom_caption}".')
+            short_prompt_parts.append(
+                f"Rich stylized 2D vertical background details (tall mid-century wooden bookshelf with colorful books, hanging potted indoor plants, framed wall pictures, stylish floor lamp, cozy desk setup) drawn in fine black ink lines and muted earthy neutrals. "
+                f"Stylized stick-figure characters with large oversized round white heads, clear expressive dot eyes and thick eyebrows, thin black stick limbs, wearing solid bold primary color shirts (red #DC2626, yellow #EAB308, green #16A34A, blue #2563EB). "
+                f"Large dynamic figures positioned prominently in the vertical frame, thick uniform black ink outlines on characters, flat 2D coloring with zero gradients, soft gray ground shadows, clean comic typography, crisp bold lines, full vertical framing filling the screen without feeling cramped or shrunken, centered subject seamlessly blending into the warm cream background fill."
+            )
+            out_prompts.append({
+                'name': short_name,
+                'type': 'companion_short',
+                'original_slide': s['name'],
+                'trigger': s.get('trigger', ''),
+                'top_title': top_title,
+                'bottom_caption': bottom_caption,
+                'prompt': " ".join(short_prompt_parts),
+                'caption': bottom_caption,
+                'aspect_ratio': '9:16'
+            })
+
     # If Long-Form: generate a dedicated 1920x1080 YouTube Thumbnail prompt in the same art style
     if is_long:
         thumb_name = f"{pdir.name}-thumbnail"
