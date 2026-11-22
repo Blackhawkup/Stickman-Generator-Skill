@@ -69,7 +69,7 @@ def get_next_topic():
     return None
 
 
-def mark_completed(topic_name, slug=None, title=None, duration=0.0, slides=0, video_path=None, music=None):
+def mark_completed(topic_name, slug=None, title=None, duration=0.0, slides=0, video_path=None, music=None, thumbnail=None):
     slug = slug or slugify(topic_name)
     title = title or topic_name.upper()
     completed = get_completed_topics()
@@ -95,6 +95,8 @@ def mark_completed(topic_name, slug=None, title=None, duration=0.0, slides=0, vi
         entry['video_path'] = str(video_path).replace('\\', '/')
     if music:
         entry['music'] = music
+    if thumbnail:
+        entry['thumbnail'] = str(thumbnail).replace('\\', '/')
     entry['status'] = 'completed'
     
     save_json_file(COMPLETED_FILE, completed)

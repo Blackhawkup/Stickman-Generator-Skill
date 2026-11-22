@@ -1,11 +1,16 @@
 """Audio mixing: voice narration + ambient musical bed + -14 LUFS loudness mastering.
 Marker drawing sounds have been completely removed.
 """
-import json, re, subprocess
+import json, re, subprocess, sys
 from pathlib import Path
 import numpy as np
 from scipy import signal
-from common import load_json, run, ffmpeg, IS_WIN
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    from common import load_json, run, ffmpeg, IS_WIN
+except ImportError:
+    from tools.common import load_json, run, ffmpeg, IS_WIN
 
 SR = 48000
 MIDI = lambda m: 440.0 * 2 ** ((m - 69) / 12.0)
@@ -80,16 +85,50 @@ def measure_lufs(path):
     return float(re.findall(r'I:\s+(-?[\d.]+) LUFS', r.stderr)[-1])
 
 
-def auto_select_music(pdir, topic_str=""):
-    """Selects an ambient music track dynamically from the 12 curated tracks:
-    curious, investigation, mystery, sneaky, playful, quirky, upbeat, reflective, deep_mystery, thoughtful, light, comedy.
+def loop_with_crossfade(audio, target_samples, crossfade_samples=int(2.5 * SR)):
+    """Seamlessly loops audio using an equal-power crossfade at wrap boundaries."""
+    if len(audio) >= target_samples:
+        return audio[:target_samples]
+    
+    seg_len = len(audio)
+    out = np.zeros((target_samples + crossfade_samples, audio.shape[1]), dtype=np.float32)
+    cur = 0
+    t = np.linspace(0, np.pi / 2, crossfade_samples)
+    fade_in = (np.sin(t) ** 2).astype(np.float32)
+    fade_out = (np.cos(t) ** 2).astype(np.float32)
+    
+    first = True
+    while cur < target_samples:
+        if first:
+            chunk = audio
+            out[cur:cur + len(chunk)] += chunk
+            cur += len(chunk) - crossfade_samples
+            first = False
+        else:
+            chunk = audio
+            head_len = min(crossfade_samples, len(chunk))
+            out[cur:cur + head_len] = (
+                out[cur:cur + head_len] * fade_out[:head_len, None] +
+                chunk[:head_len] * fade_in[:head_len, None]
+            )
+            rest = chunk[head_len:]
+            out[cur + head_len:cur + len(chunk)] += rest
+            cur += len(chunk) - crossfade_samples
+            
+    return out[:target_samples]
+
+
+def auto_select_music(pdir=None, topic_str=""):
+    """Selects an ambient music track dynamically from the curated modern explainer library.
+    Prioritizes calm, aesthetic, modern lo-fi and documentary ambient beds:
+    clean_soul, deliberate_thought, perspectives, thoughtful, reflective, heartwarming, light, deep_mystery, composed.
     Avoids recently used tracks in completed_topics.json and matches topic mood.
     """
     catalog_path = Path(__file__).resolve().parent.parent / 'audio' / 'music' / 'music_catalog.json'
     catalog = load_json(catalog_path) if catalog_path.exists() else []
     all_tracks = [t['id'] for t in catalog] if catalog else [
-        'curious', 'investigation', 'mystery', 'sneaky', 'playful', 'quirky',
-        'upbeat', 'reflective', 'deep_mystery', 'thoughtful', 'light', 'comedy'
+        'clean_soul', 'deliberate_thought', 'perspectives', 'thoughtful', 'reflective',
+        'heartwarming', 'light', 'deep_mystery', 'composed'
     ]
     
     # Check completed topics for recently used tracks
@@ -97,32 +136,40 @@ def auto_select_music(pdir, topic_str=""):
     completed = load_json(topics_file) if topics_file.exists() else []
     recent_tracks = [x.get('music') for x in completed[-4:] if x.get('music')]
     
-    # Analyze topic/script keywords for mood
+    # Handle flexible inputs
+    if isinstance(pdir, (list, tuple)):
+        topic_str = " ".join(str(x) for x in pdir)
+        pdir = None
+    elif isinstance(pdir, str) and not Path(pdir).is_dir():
+        topic_str = f"{pdir} {topic_str}".strip()
+        pdir = None
+
     search_text = (topic_str or "").lower()
-    pdir = Path(pdir)
-    if not search_text:
+    if pdir:
+        pdir = Path(pdir)
         film_file = pdir / 'film.json'
         if film_file.exists():
             cfg = load_json(film_file)
-            search_text = (cfg.get('topic') or cfg.get('title') or cfg.get('slug') or '').lower()
+            search_text += " " + (cfg.get('topic') or cfg.get('title') or cfg.get('slug') or '').lower()
         script_file = pdir / 'script.md'
         if script_file.exists():
-            search_text += " " + script_file.read_text(encoding='utf-8')[:300].lower()
+            search_text += " " + script_file.read_text(encoding='utf-8')[:400].lower()
             
-    # Mood candidate mappings
-    candidates = []
-    if any(k in search_text for k in ('bias', 'fallacy', 'paradox', 'trick', 'irrational', 'brain', 'illusion', 'sunk cost', 'spotlight')):
-        candidates = ['curious', 'sneaky', 'quirky', 'thoughtful']
-    elif any(k in search_text for k in ('study', 'experiment', 'research', 'evidence', 'scientist', 'test', 'data', 'laboratory')):
-        candidates = ['investigation', 'thoughtful', 'deep_mystery']
-    elif any(k in search_text for k in ('mystery', 'secret', 'hidden', 'dark', 'unexplained', 'bizarre', 'strange')):
-        candidates = ['mystery', 'deep_mystery', 'investigation']
-    elif any(k in search_text for k in ('funny', 'humor', 'embarrass', 'clumsy', 'mistake', 'awkward', 'spill', 'pratfall', 'laugh', 'coffee')):
-        candidates = ['playful', 'comedy', 'quirky', 'sneaky']
-    elif any(k in search_text for k in ('growth', 'lesson', 'decision', 'mindset', 'life', 'habit', 'relationship', 'future', 'success')):
-        candidates = ['reflective', 'upbeat', 'light', 'thoughtful']
+    # Sophisticated explainer candidate mappings (zero cartoon tracks)
+    if any(k in search_text for k in ('time', 'work', 'productivity', 'parkinson', 'focus', 'discipline', 'habit', 'procrastination', 'deadline')):
+        candidates = ['clean_soul', 'thoughtful', 'deliberate_thought', 'perspectives', 'reflective']
+    elif any(k in search_text for k in ('study', 'experiment', 'science', 'research', 'evidence', 'psychology', 'data', 'laboratory', 'test', 'aronson', 'kahneman')):
+        candidates = ['deliberate_thought', 'perspectives', 'clean_soul', 'thoughtful', 'composed']
+    elif any(k in search_text for k in ('bias', 'fallacy', 'sunk cost', 'paradox', 'irrational', 'brain', 'illusion', 'decision')):
+        candidates = ['clean_soul', 'reflective', 'deliberate_thought', 'perspectives', 'thoughtful']
+    elif any(k in search_text for k in ('mystery', 'secret', 'hidden', 'dark', 'unexplained', 'strange', 'curiosity')):
+        candidates = ['deep_mystery', 'deliberate_thought', 'perspectives', 'clean_soul']
+    elif any(k in search_text for k in ('social', 'pratfall', 'spotlight', 'people', 'flaw', 'awkward', 'confidence', 'humor')):
+        candidates = ['clean_soul', 'reflective', 'heartwarming', 'thoughtful']
+    elif any(k in search_text for k in ('growth', 'life', 'lesson', 'mindset', 'success', 'future', 'philosophy')):
+        candidates = ['perspectives', 'heartwarming', 'reflective', 'clean_soul', 'composed']
     else:
-        candidates = ['curious', 'thoughtful', 'reflective', 'investigation', 'playful', 'quirky']
+        candidates = ['clean_soul', 'deliberate_thought', 'perspectives', 'reflective', 'thoughtful', 'light', 'composed']
         
     # Filter out recent tracks to ensure dynamic rotation
     fresh_candidates = [c for c in candidates if c not in recent_tracks and c in all_tracks]
@@ -180,7 +227,7 @@ def mix_audio(pdir, target_lufs=-14.0):
             bed = composed_ambient_bed(N)
         else:
             raw = ffmpeg_decode(m_target, 2).reshape(-1, 2)
-            bed = np.vstack([raw] * (N // len(raw) + 1))[:N]
+            bed = loop_with_crossfade(raw, N)
             
         # Sidechain voice ducking
         fade = np.ones(N, np.float32)
@@ -194,7 +241,7 @@ def mix_audio(pdir, target_lufs=-14.0):
         win2 = int(0.12 * SR)
         duck = signal.fftconvolve(duck, np.ones(win2) / win2, mode='same')
         
-        music_vol_db = cfg.get('music_db', -26)
+        music_vol_db = cfg.get('music_db', -29)
         bed = bed * (fade * duck)[:, None] * 10 ** (music_vol_db / 20) / (np.sqrt(np.mean(bed ** 2)) + 1e-9)
         out += bed.astype(np.float32)
         

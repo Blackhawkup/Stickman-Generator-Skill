@@ -63,13 +63,42 @@ The sequence is strictly: **NAME OF THE THING FIRST, THEN THE IMAGINE PART**.
 
 ---
 
-## 🎵 Dynamic Background Music Rotation (12 Tracks)
+## 🎵 Sophisticated Explainer Audio & Dynamic Music Rotation
 
-Never repeat the same background music track across videos:
-- Curated library of 12 royalty-free instrumental tracks in `audio/music/`:
-  `curious`, `investigation`, `mystery`, `sneaky`, `playful`, `quirky`, `upbeat`, `reflective`, `deep_mystery`, `thoughtful`, `light`, `comedy`.
-- When set to `"music": "auto"` (the default), `mix.py` automatically maps the topic theme and mood to track candidates while inspecting `topics/completed_topics.json` to prevent back-to-back repeats.
-- Narration is mastered to **-14.0 LUFS** with music dynamically ducked to **-26.0 dB** behind speech.
+Never use annoying cartoon meme tracks or repetitive loops:
+- Curated library of modern, calm, sophisticated explainer instrumental tracks in `audio/music/`:
+  * `clean_soul`: Smooth, modern Rhodes piano lo-fi chillhop groove (habits, everyday life, psychology).
+  * `deliberate_thought`: Minimalist, intellectual marimba and subtle acoustic pulse (scientific studies, data, experiments).
+  * `perspectives`: Neutral, elegant modern documentary acoustic flow (10-minute long-form deep dives, history, multi-part cases).
+  * `thoughtful`: Steady, productive acoustic rhythm (Parkinson's Law, time management, productivity).
+  * `reflective`: Calm introspective walking tempo with Rhodes chords (philosophical takeaways, mindsets).
+  * `heartwarming`: Gentle uplifting acoustic warmth and piano (breakthroughs, actionable insights).
+  * `light`: Ultra-clean subtle ambient background that stays completely out of the way of spoken voice.
+  * `deep_mystery`: Low-key noir detective jazz bass for unresolved paradoxes.
+  * `composed`: Procedurally synthesized lush harmonic ambient pad with warm reverb. Infinite length, zero ear fatigue.
+- **Zero Cartoon Comedy**: Wacky cartoon tracks (`comedy`, `playful`, `sneaky`, `quirky`) are removed from rotation.
+- **Seamless Crossfade Looping**: Audio loops with an equal-power 2.5s crossfade, eliminating abrupt cuts or glitches over 10-minute videos.
+- **Loudness Balance**: Narration mastered to **-14.0 LUFS** with music ducked to **-29.0 dB** so it sits softly in the background.
+
+---
+
+## 🖼️ Mandatory 1920x1080 High-CTR YouTube Thumbnail
+
+For every long-format video, a dedicated 1920x1080 YouTube thumbnail **MUST ALWAYS be generated and used**:
+- **Design Formula**:
+  * Large, bold comic book headline title across the top: `"{TOPIC TITLE}"`.
+  * High-contrast red accent hook/warning banner (`#DC2626`).
+  * Centered expressive stick-figure character in crimson red shirt (#DC2626) reacting in shock/disbelief to the core dilemma.
+  * Warm cream parchment background (`#FBF6EF`) with 2D bookshelf, desk, and subtle spotlighting.
+- **Automatic Generation**:
+  * Generated and preserved at `<project>/<slug>-thumbnail.png`.
+  * Can be created directly via `python tools/cli.py thumbnail <slug>` or during `cli.py auto`.
+- **Where the Thumbnail is Used**:
+  * **Deliverable**: Saved directly in project root ready for YouTube upload.
+  * **Metadata**: Linked in `<slug>-metadata.json` under `"thumbnail_path"`.
+  * **Ledger**: Recorded in `topics/completed_topics.json` under `"thumbnail"`.
+  * **Web Player**: Embedded in `build/page.html` as the pre-play poster.
+  * **Deliverable Presentation**: The agent MUST present a clickable link and image preview to the user upon completion.
 
 ---
 
@@ -132,6 +161,9 @@ python tools/cli.py tts <slug> --voice Charon
 
 # Validate timing & pacing rules (mostly ~3s, sometimes ~2s)
 python tools/cli.py check <slug>
+
+# Generate dedicated 1920x1080 High-CTR YouTube Thumbnail
+python tools/cli.py thumbnail <slug>
 
 # 1-Command Autonomous Production
 # - Generates primary video + companion short (if long) + thumbnail (if long)

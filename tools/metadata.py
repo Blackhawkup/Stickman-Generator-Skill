@@ -2,9 +2,14 @@
 Generates engaging video captions, exactly 5 targeted hashtags,
 and YouTube thumbnail prompts for 10-minute long-form explainer videos.
 """
-import json, re
+import json, re, sys
 from pathlib import Path
-from common import load_json, save_json
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    from common import load_json, save_json
+except ImportError:
+    from tools.common import load_json, save_json
 
 
 def generate_hashtags(topic, script_text=""):
@@ -74,9 +79,18 @@ def save_metadata(pdir, topic, slug, script_text="", mode="short", video_path=No
     pdir = Path(pdir)
     data = generate_caption(topic, slug, script_text=script_text, mode=mode)
     if video_path:
-        data["video_path"] = str(video_path)
+        data["video_path"] = str(video_path).replace('\\', '/')
+        
+    if not thumbnail_path:
+        cand1 = pdir / f"{slug}-thumbnail.png"
+        cand2 = pdir / 'images' / f"{slug}-thumbnail.png"
+        if cand1.exists():
+            thumbnail_path = cand1
+        elif cand2.exists():
+            thumbnail_path = cand2
+            
     if thumbnail_path:
-        data["thumbnail_path"] = str(thumbnail_path)
+        data["thumbnail_path"] = str(thumbnail_path).replace('\\', '/')
 
     # Save human-readable caption with 5 hashtags
     caption_file = pdir / f"{slug}-caption.txt"

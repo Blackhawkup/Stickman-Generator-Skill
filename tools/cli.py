@@ -18,6 +18,7 @@ Commands:
   python tools/cli.py render <project>
   python tools/cli.py extract-short <project>
   python tools/cli.py caption <project>
+  python tools/cli.py thumbnail <project>
   python tools/cli.py auto <project> [--voice Charon] [--keep-temp]
   python tools/cli.py topics [next|list|completed]
 """
@@ -210,6 +211,15 @@ def main():
         import subprocess
         subprocess.check_call(['node', str(script), str(pdir)])
 
+    elif cmd == 'thumbnail':
+        parser.add_argument('project')
+        args = parser.parse_args(rest)
+        pdir = resolve_project(args.project)
+        import thumbnail
+        cfg = load_json(pdir / 'film.json')
+        topic_name = cfg.get('topic', cfg.get('title', pdir.name.replace('-', ' ').title()))
+        thumbnail.build_and_save_thumbnail(pdir, topic_name=topic_name)
+
     elif cmd == 'auto':
         parser.add_argument('project')
         parser.add_argument('--voice', default='Charon')
@@ -264,15 +274,15 @@ def main():
             short_mp4 = out_dir / f"{slug}-short.mp4"
             extract_short.extract_short(pdir, short_mp4)
             
-            # Thumbnail file
-            thumb_cand = pdir / 'images' / f"{slug}-thumbnail.png"
-            thumb_dest = pdir / f"{slug}-thumbnail.png"
-            if thumb_cand.exists():
-                shutil.copy2(thumb_cand, thumb_dest)
+            # Step 7b: Generate & verify 1920x1080 High-CTR YouTube Thumbnail
+            print("\n[Step 7b] Generating 1920x1080 High-CTR YouTube Thumbnail...")
+            import thumbnail
+            thumb_dest = thumbnail.build_and_save_thumbnail(pdir, topic_name=topic_name)
             
             # Metadata & Captions + 5 Hashtags
-            metadata.save_metadata(pdir, topic_name, slug, script_text=script_text, mode='long', video_path=out_mp4, thumbnail_path=thumb_dest if thumb_dest.exists() else None)
+            metadata.save_metadata(pdir, topic_name, slug, script_text=script_text, mode='long', video_path=out_mp4, thumbnail_path=thumb_dest)
         else:
+            thumb_dest = None
             out_mp4 = out_dir / f"{slug}.mp4"
             render.export_video(pdir, out_mp4, preview=False)
             
@@ -291,7 +301,8 @@ def main():
             duration=dur,
             slides=len(slides),
             video_path=out_mp4,
-            music=cfg.get('music')
+            music=cfg.get('music'),
+            thumbnail=thumb_dest if (thumb_dest and Path(thumb_dest).exists()) else None
         )
 
         # Step 8: Clean up intermediate scratch files (preserving only deliverables)

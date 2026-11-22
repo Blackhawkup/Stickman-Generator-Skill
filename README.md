@@ -19,12 +19,13 @@ Designed to run in any directory, generating finished deliverables (videos, soci
 - **⏱️ High-Retention Pacing (Mostly 3s, Sometimes 2s)**:
   - Slides stay on screen for mostly **~3.0 seconds**, dipping to **~2.0 seconds** for fast surprise beats or punchlines (target average ~2.8s–3.2s).
   - In long-form after 2 minutes, slides stay on screen for **5.0 to 6.0 seconds** for deep exposition.
-- **🎵 Dynamic Background Music Rotation (12 Tracks)**:
-  - Curated library of 12 royalty-free instrumental tracks in `audio/music/` (`curious`, `investigation`, `mystery`, `sneaky`, `playful`, `quirky`, `upbeat`, `reflective`, `deep_mystery`, `thoughtful`, `light`, `comedy`).
-  - Automatically matches topic mood and rotates tracks using `topics/completed_topics.json` history to prevent back-to-back repeats.
-- **🎨 Rich 2D Background Details**:
-  - Backgrounds feature stylized, charming 2D environmental elements: mid-century bookshelves, framed wall art, modern potted plants, stylish floor lamps, cozy desks, office whiteboards, and subtle city skylines in fine ink lines with muted earthy neutrals.
-- **🖼️ 1920x1080 YouTube Thumbnail**: Automatically generates a high-CTR, dramatic widescreen thumbnail featuring the topic name in the exact same editorial stick-figure webcomic art style.
+- **🎵 Sophisticated Explainer Audio & Dynamic Music Rotation**:
+  - Curated library of modern, calm explainer instrumental tracks: `clean_soul` (chill Rhodes lo-fi), `deliberate_thought` (documentary marimba & pulse), `perspectives` (modern documentary acoustic flow), `thoughtful` (productive acoustic beat), `reflective` (introspective Rhodes chords), `heartwarming` (uplifting acoustic guitar), `light` (ambient minimal), and `composed` (procedural harmonic ambient pad).
+  - **Zero Cartoon Comedy**: Wacky cartoon/meme tracks banished from rotation.
+  - **Seamless 2.5s Crossfade Looping**: Eliminates harsh cuts or glitches across 10-minute videos. Ducked to **-29.0 dB** behind narration.
+- **🖼️ Mandatory 1920x1080 YouTube Thumbnail**:
+  - Automatically generates an eye-catching, high-CTR 16:9 widescreen thumbnail featuring the uppercase topic title, crimson red hook badge, and expressive editorial stick-figure illustration (`<slug>-thumbnail.png`).
+  - Recorded in `<slug>-metadata.json` and `completed_topics.json`. Dedicated CLI command: `python tools/cli.py thumbnail <slug>`.
 - **🎁 Automatic Companion Short**: Producing a 10-minute long-form video automatically renders an accompanying 720x1600 Short (`out/<slug>-short.mp4`) from the opening hook.
 - **📝 Social Captions + Exactly 5 Hashtags**: Every generated video automatically produces an engaging caption accompanied by exactly 5 targeted hashtags (`<slug>-caption.txt`).
 - **🧹 Zero-Clutter Auto-Cleanup**: The directory where the agent is run is where deliverables are saved. All intermediate scratch files (`build/`, `voice/`, `images/`, `out_frames/`, raw WAVs) are automatically deleted upon completion.
@@ -53,12 +54,13 @@ Stickman-Generator-Skill/
 ├── tools/                            # Production toolchain
 │   ├── cli.py                        # Unified command-line interface
 │   ├── metadata.py                   # Caption + 5 hashtags generator
+│   ├── thumbnail.py                  # 1920x1080 High-CTR YouTube Thumbnail generator
 │   ├── cleanup.py                    # Automatic scratch file cleanup utility
 │   ├── check.py                      # Pacing validation (mostly ~3s, sometimes ~2s)
 │   ├── extract_short.py              # Automatic companion short generator (720x1600)
 │   ├── prompts.py                    # Slide prompt compiler (1920x1080, 720x1600 & thumbnail)
 │   ├── voice.py                      # TTS generator & Whisper word-clock alignment
-│   ├── mix.py                        # Dynamic music rotation across 12 tracks & ducking (-26dB)
+│   ├── mix.py                        # Sophisticated music selection & crossfade looping (-29dB)
 │   ├── build.py                      # HTML web player generator (full cream fill, no black bars)
 │   ├── render.py                     # Parallel Playwright frame capturer + FFmpeg
 │   └── topics.py                     # Topic queue & deduplication manager
@@ -117,9 +119,12 @@ python tools/cli.py tts <slug> --voice Charon
 # 5. Validate timing & pacing rules (mostly ~3s, sometimes ~2s)
 python tools/cli.py check <slug>
 
-# 6. 1-Command Autonomous Production
+# 6. Generate dedicated 1920x1080 YouTube Thumbnail (for long-form videos)
+python tools/cli.py thumbnail <slug>
+
+# 7. 1-Command Autonomous Production
 # - Generates primary video + companion short (if long) + thumbnail (if long)
-# - Rotates background music dynamically from 12 curated tracks
+# - Selects aesthetic lo-fi / ambient documentary soundtrack & crossfades
 # - Generates social caption + 5 hashtags
 # - Cleans up all intermediate scratch files automatically
 # - Updates topics/completed_topics.json
