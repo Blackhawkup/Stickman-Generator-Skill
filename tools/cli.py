@@ -69,33 +69,62 @@ def main():
     parser = argparse.ArgumentParser(prog=f"cli.py {cmd}")
 
     if cmd == 'new':
-        parser.add_argument('slug')
+        parser.add_argument('slug', nargs='?', default=None, help="Project slug (omit to auto-pick catchiest uncompleted topic)")
         parser.add_argument('--mode', default='short', choices=['short', 'long'], help="Video mode: short (~1m) or long (~10m)")
-        parser.add_argument('--format', choices=['16:9', '9:16', '1:1'], help="Aspect ratio (defaults to 16:9 for long, 9:16 for short)")
+        parser.add_argument('--format', choices=['16:9', '9:16', '1:1', '720:1600'], help="Aspect ratio (defaults to 16:9 for long, 9:16 for short)")
         parser.add_argument('--dir', help="Custom destination directory (defaults to current working directory or projects/)")
+        parser.add_argument('--topic', help="Optional explicit topic title")
+        parser.add_argument('--auto-topic', action='store_true', help="Automatically pick the catchiest uncompleted topic")
         args = parser.parse_args(rest)
         
-        if args.dir:
-            dest = Path(args.dir).expanduser() / args.slug
-        elif Path.cwd().name == 'slideshow-workflow':
-            dest = PROJECTS_DIR / args.slug
+        picked_topic = None
+        if not args.slug or args.auto_topic:
+            import topics
+            picked_topic = topics.get_best_topic()
+            if not picked_topic:
+                die("No unproduced topics remaining in topics/example_topics.json. Add new ideas or pass an explicit slug.")
+            slug = args.slug or picked_topic.get('slug') or topics.slugify(picked_topic['topic'])
         else:
-            dest = Path.cwd() / args.slug
+            slug = args.slug
+
+        if args.dir:
+            dest = Path(args.dir).expanduser() / slug
+        elif Path.cwd().name == 'slideshow-workflow':
+            dest = PROJECTS_DIR / slug
+        else:
+            dest = Path.cwd() / slug
 
         if dest.exists():
-            die(f"Project '{args.slug}' already exists at {dest}")
+            die(f"Project '{slug}' already exists at {dest}")
         dest.mkdir(parents=True, exist_ok=True)
         shutil.copytree(TEMPLATES_DIR, dest, dirs_exist_ok=True)
         
         cfg = load_json(dest / 'film.json')
-        cfg['slug'] = args.slug
+        cfg['slug'] = slug
         cfg['mode'] = args.mode
         cfg['format'] = args.format if args.format else ('16:9' if args.mode == 'long' else '9:16')
+        cfg['subtitles'] = {'enabled': True}
+        if args.topic:
+            cfg['topic'] = args.topic
+            cfg['title'] = args.topic.upper()
+        elif picked_topic:
+            cfg['topic'] = picked_topic['topic']
+            cfg['title'] = picked_topic['topic'].upper()
+        if cfg['format'] == '16:9':
+            cfg.setdefault('canvas', {})['aspect_ratio'] = '16:9'
+            cfg['canvas']['width'] = 1920
+            cfg['canvas']['height'] = 1080
+        elif cfg['format'] == '9:16':
+            cfg.setdefault('canvas', {})['aspect_ratio'] = '9:16'
+            cfg['canvas']['width'] = 1080
+            cfg['canvas']['height'] = 1920
         save_json(dest / 'film.json', cfg)
         for d in ('images', 'voice', 'out', 'build'):
             (dest / d).mkdir(exist_ok=True)
         print(f"\n[Project Created] {dest}")
-        print(f"Mode: {cfg['mode'].upper()} | Format: {cfg['format']}")
+        if picked_topic:
+            print(f"Auto-Selected Topic: {picked_topic['topic']} ({picked_topic.get('category', 'General')})")
+        print(f"Mode: {cfg['mode'].upper()} | Format: {cfg['format']} | Subtitles: ENABLED")
 
     elif cmd == 'prompts':
         parser.add_argument('project')
@@ -208,8 +237,16 @@ def main():
         args = parser.parse_args(rest)
         pdir = resolve_project(args.project)
         script = Path(__file__).resolve().parent / 'generate_all_slides.mjs'
-        import subprocess
+        import subprocess, images_util
         subprocess.check_call(['node', str(script), str(pdir)])
+        images_util.normalize_project_images(pdir)
+
+    elif cmd == 'normalize':
+        parser.add_argument('project')
+        args = parser.parse_args(rest)
+        pdir = resolve_project(args.project)
+        import images_util
+        images_util.normalize_project_images(pdir)
 
     elif cmd == 'thumbnail':
         parser.add_argument('project')
@@ -231,7 +268,7 @@ def main():
         topic_name = cfg.get('topic', cfg.get('title', slug.replace('-', ' ').title()))
         is_long = (cfg.get('mode') == 'long' or cfg.get('format') == '16:9')
         script_path = Path(__file__).resolve().parent / 'generate_all_slides.mjs'
-        import prompts, voice, mix, build, check, render, subprocess, metadata, cleanup
+        import prompts, voice, mix, build, check, render, subprocess, metadata, cleanup, images_util
 
         mode_title = "10-MINUTE LONG FORM" if is_long else "1-MINUTE SHORT"
         print(f"\n============================================================")
@@ -242,22 +279,23 @@ def main():
         print("\n[Step 1/7] Compiling Prompts (Including Thumbnail for Long Form)...")
         prompts.build_prompts(pdir)
 
-        print("\n[Step 2/7] Generating Narration & Clocks...")
+        print("\n[Step 2/7] Generating Narration & Clocks (Subtitles Synced)...")
         files = voice.tts_generate(pdir, voice=args.voice)
         voice.align_and_lock_voice(pdir, files)
 
-        print("\n[Step 3/7] Generating Artwork & Thumbnail via Google Flow...")
+        print("\n[Step 3/7] Generating Artwork & Normalizing Resolutions via Google Flow...")
         subprocess.check_call(['node', str(script_path), str(pdir)])
+        images_util.normalize_project_images(pdir)
 
         print("\n[Step 4/7] Mixing Soundtrack & Ducking Music...")
         mix.mix_audio(pdir)
 
-        print("\n[Step 5/7] Building Viewer & Validating Pacing...")
+        print("\n[Step 5/7] Building Subtitled Viewer & Validating Pacing...")
         build.build_page(pdir)
         if not check.check_project(pdir):
             print("\n[Notice] Proceeding despite warnings...")
 
-        print("\n[Step 6/7] Rendering Primary 60fps MP4...")
+        print("\n[Step 6/7] Rendering Primary 60fps MP4 with Synced Subtitles...")
         out_dir = pdir / 'out'
         out_dir.mkdir(exist_ok=True)
         
@@ -268,8 +306,8 @@ def main():
             out_mp4 = out_dir / f"{slug}-long.mp4"
             render.export_video(pdir, out_mp4, preview=False)
             
-            # Step 7a: Automatically extract and render companion Short!
-            print("\n[Step 7/7] Automatically Extracting & Rendering Companion 1-Minute Short (9:16)...")
+            # Step 7a: Automatically extract and render companion Short (1080x1920, 9:16)!
+            print("\n[Step 7/7] Automatically Extracting & Rendering Companion 1-Minute Short (1080x1920, 9:16)...")
             import extract_short
             short_mp4 = out_dir / f"{slug}-short.mp4"
             extract_short.extract_short(pdir, short_mp4)
@@ -312,11 +350,11 @@ def main():
         print(f"[Auto Pipeline] Production Finished for '{slug}'!")
         print(f"All scratch files deleted. Final deliverables ready in {pdir}:")
         if is_long:
-            print(f"  ★ Master Video:     {slug}-long.mp4 (16:9, ~10m)")
-            print(f"  ★ Companion Short:  {slug}-short.mp4 (9:16, ~1m)")
-            print(f"  ★ Video Thumbnail:  {slug}-thumbnail.png (16:9)")
+            print(f"  ★ Master Video:     {slug}-long.mp4 (16:9, 1920x1024 slides, Subtitled, ~10m)")
+            print(f"  ★ Companion Short:  {slug}-short.mp4 (9:16, 1080x1920, Subtitled, ~1m)")
+            print(f"  ★ Video Thumbnail:  {slug}-thumbnail.png (16:9, 1920x1080)")
         else:
-            print(f"  ★ Finished Short:   {slug}.mp4 (9:16, ~1m)")
+            print(f"  ★ Finished Short:   {slug}.mp4 (9:16, 1080x1920, Subtitled, ~1m)")
         print(f"  ★ Social Caption:   {slug}-caption.txt (with 5 targeted hashtags)")
         print(f"  ★ Metadata Record:  {slug}-metadata.json")
         print(f"  ★ Topics Ledger:    Updated topics/completed_topics.json")
@@ -325,8 +363,8 @@ def main():
     elif cmd == 'topics':
         import topics
         subcmd = rest[0] if rest else 'list'
-        if subcmd == 'next':
-            nxt = topics.get_next_topic()
+        if subcmd in ('next', 'best'):
+            nxt = topics.get_best_topic()
             print(json.dumps(nxt, indent=2) if nxt else json.dumps({'error': 'No more unproduced topics.'}))
         elif subcmd == 'completed':
             comp = topics.get_completed_topics()

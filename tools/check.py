@@ -30,9 +30,9 @@ def check_project(pdir):
         dur = probe_duration(narration_path)
         
     # Determine video mode: short vs long
-    fmt = cfg.get('format', '720:1600')
-    mode = cfg.get('mode', 'long' if fmt in ('16:9', '1920:1080', 'laptop', 'long') or dur > 180 else 'short')
-    is_long = (mode == 'long' or fmt in ('16:9', '1920:1080', 'laptop') or dur > 180)
+    fmt = cfg.get('format', '9:16')
+    mode = cfg.get('mode', 'long' if fmt in ('16:9', '1920:1080', '1920:1024', 'laptop', 'long') or dur > 180 else 'short')
+    is_long = (mode == 'long' or fmt in ('16:9', '1920:1080', '1920:1024', 'laptop') or dur > 180)
         
     # 2. Check words & timeline pacing
     words_data = load_json(words_file) if words_file.exists() else []
@@ -140,7 +140,7 @@ def check_project(pdir):
         elif avg_dur > 3.6:
             warnings.append(f"Average duration ({avg_dur:.2f}s) is too slow. Target is mostly 3s, sometimes 2s (~2.8s-3.2s avg).")
                 
-    mode_str = f"Long-Form 1920x1080 ({dur / 60:.1f} min)" if is_long else f"Short/Reel 720x1600 ({dur:.1f}s)"
+    mode_str = f"Long-Form 16:9 / 1920x1024 images ({dur / 60:.1f} min)" if is_long else f"Short/Reel 9:16 / 1080x1920 ({dur:.1f}s)"
     print(f"\n[Check] Validating '{cfg.get('slug', pdir.name)}' [{mode_str}]:")
     print(f"Total Slides: {len(slides)} | Audio Duration: {dur:.1f}s{avg_str}")
     for w in warnings:

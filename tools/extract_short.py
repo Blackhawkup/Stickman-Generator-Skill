@@ -102,31 +102,38 @@ def extract_short(pdir, out_short_mp4=None, max_duration=65.0):
         str(short_audio)
     ])
 
-    # 3. Build vertical 720x1600 companion short viewer
+    # 3. Build vertical 1080x1920 (9:16) companion short viewer
+    try:
+        import images_util
+        images_util.normalize_project_images(pdir)
+    except Exception as e:
+        print(f"[Companion Short] Note during image normalization: {e}")
+
     shutil.copy(ENGINE_DIR / 'slideshow.js', bdir / 'slideshow.js')
     
-    # 720x1600 phone layout with matching cream background (#FBF6EF)
+    # 1080x1920 (9:16) phone layout with matching cream background (#FBF6EF) and synced subtitles
     short_film = {
-        'W': 720,
-        'H': 1600,
-        'format': '720:1600',
+        'W': 1080,
+        'H': 1920,
+        'format': '9:16',
         'theme': {
             'background': '#FBF6EF',
             'font_family': "'Comic Sans MS', 'Comic Neue', cursive, sans-serif",
             'canvas_bg': '#FBF6EF'
         },
         'canvas': {
-            'aspect_ratio': '720:1600',
-            'width': 720,
-            'height': 1600,
+            'aspect_ratio': '9:16',
+            'width': 1080,
+            'height': 1920,
             'canvas_bg': '#FBF6EF',
             'border_radius': 0,
             'shadow': False,
             'blur_backdrop': False
         },
+        'subtitles': cfg.get('subtitles', {'enabled': True}),
         'transitions': {'default_type': 'cut', 'fade_duration': 0.0, 'ken_burns_zoom': 1.0}
     }
-    # Dedicated separate 9:16 vertical images for companion short
+    # Dedicated separate 1080x1920 (9:16) vertical images for companion short
     short_slides_built = []
     for s in short_slides:
         s_copy = dict(s)
@@ -134,7 +141,7 @@ def extract_short(pdir, out_short_mp4=None, max_duration=65.0):
         short_img_path = pdir / 'images' / short_img_name
         if short_img_path.exists():
             s_copy['src'] = f"../images/{short_img_name}"
-            print(f" -> Companion Short using dedicated 1024x1024 square image: {short_img_name}")
+            print(f" -> Companion Short using dedicated 1080x1920 (9:16) image: {short_img_name}")
         else:
             s_copy['src'] = f"../images/{s['name']}.png"
         short_slides_built.append(s_copy)
@@ -156,8 +163,8 @@ def extract_short(pdir, out_short_mp4=None, max_duration=65.0):
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     html, body {{
-      width: 720px;
-      height: 1600px;
+      width: 1080px;
+      height: 1920px;
       overflow: hidden;
       background: #FBF6EF;
       font-family: 'Comic Sans MS', 'Comic Neue', cursive, sans-serif;
@@ -166,8 +173,8 @@ def extract_short(pdir, out_short_mp4=None, max_duration=65.0):
     #viewport {{
       position: absolute;
       inset: 0;
-      width: 720px;
-      height: 1600px;
+      width: 1080px;
+      height: 1920px;
       overflow: hidden;
       background: #FBF6EF;
     }}
@@ -194,8 +201,8 @@ def extract_short(pdir, out_short_mp4=None, max_duration=65.0):
     short_html = bdir / 'page_short.html'
     short_html.write_text(html_content, encoding='utf-8')
 
-    # 4. Render companion short MP4 (720x1600, 60fps)
-    print(f"[Companion Short] Rendering vertical phone 720x1600 short ({short_dur:.1f}s) to {out_short_mp4}...")
+    # 4. Render companion short MP4 (1080x1920, 9:16, 60fps)
+    print(f"[Companion Short] Rendering vertical phone 1080x1920 (9:16) short ({short_dur:.1f}s) to {out_short_mp4}...")
     
     async def render_short():
         from playwright.async_api import async_playwright
@@ -206,7 +213,7 @@ def extract_short(pdir, out_short_mp4=None, max_duration=65.0):
         fps = 60
         scale = 1.0
         crf = 16
-        W, H = 720, 1600
+        W, H = 1080, 1920
         total_frames = round(short_dur * fps)
         n_workers = max(1, min(int(os.environ.get('WB_WORKERS', '0')) or max(1, (os.cpu_count() or 4) // 2), 6))
         

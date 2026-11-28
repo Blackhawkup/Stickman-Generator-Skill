@@ -14,13 +14,15 @@ except ImportError:
 def get_dimensions(fmt):
     """Resolves width and height for format."""
     f = str(fmt).lower()
-    if f in ('720:1600', '720x1600', 'phone', 'short', 'reel', 'reels', '9:16'):
+    if f in ('1080:1920', '1080x1920', '9:16', 'phone', 'short', 'reel', 'reels'):
+        return 1080, 1920
+    if f in ('720:1600', '720x1600'):
         return 720, 1600
-    if f in ('16:9', '1920:1080', '1920x1080', 'laptop', 'long', 'desktop', 'wide'):
+    if f in ('16:9', '1920:1080', '1920x1080', '1920:1024', '1920x1024', 'laptop', 'long', 'desktop', 'wide'):
         return 1920, 1080
     if f in ('1:1', 'square'):
         return 1080, 1080
-    return 720, 1600
+    return 1080, 1920
 
 
 async def open_page(browser, html_path, W, H):

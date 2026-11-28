@@ -87,17 +87,26 @@ async def run_batch(project_dir):
         if not page:
             raise RuntimeError("No Google Flow page open on CDP port 9333")
             
-        await set_composer(page, "9:16")
-        
+        current_ar = None
         for i, s in enumerate(prompts):
             name = s['name']
+            ar = s.get('aspect_ratio', '9:16')
             out_file = img_dir / f"{name}.png"
             if out_file.exists():
                 print(f"[{i+1}/{len(prompts)}] {name} already exists. Skipping.")
                 continue
-            print(f"\n[{i+1}/{len(prompts)}] Generating {name}...")
+            if ar != current_ar:
+                await set_composer(page, ar)
+                current_ar = ar
+            print(f"\n[{i+1}/{len(prompts)}] Generating [{ar}] {name}...")
             await generate_and_download(page, s['prompt'], out_file)
             await asyncio.sleep(1.5)
+
+    try:
+        import images_util
+        images_util.normalize_project_images(pdir)
+    except Exception as e:
+        print(f"[Flow Driver] Note during dimension normalization: {e}")
 
 if __name__ == '__main__':
     import sys

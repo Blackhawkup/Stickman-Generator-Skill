@@ -1,7 +1,8 @@
 """Compiles slides.json into Flow MCP prompts using customizable prompt templates.
 Supports:
-- 1920x1080 widescreen landscape for laptop / long-form videos
-- 720x1600 portrait canvas for phone / short / reel videos (centered with warm cream background #FBF6EF fill)
+- 1920x1024 (16:9) widescreen landscape for laptop / long-form videos
+- 1080x1920 (9:16) vertical portrait canvas for phone / short / reel videos (warm cream #FBF6EF background)
+- Separate 1080x1920 (9:16) companion short images for long-form projects
 - Dedicated 1920x1080 high-CTR YouTube thumbnail prompt in the same art style
 - Rich stylized 2D background details (furniture, bookshelves, indoor plants, architectural lines)
 """
@@ -26,9 +27,9 @@ def build_prompts(project_dir):
     bg_color = preset.get('background', '#FBF6EF')
     
     project_title = cfg.get('title', pdir.name.replace('-', ' ')).upper()
-    fmt = cfg.get('format', '720:1600')
-    mode = cfg.get('mode', 'long' if fmt in ('16:9', '1920:1080', 'laptop', 'long') else 'short')
-    is_long = (mode == 'long' or fmt in ('16:9', '1920:1080', 'laptop'))
+    fmt = cfg.get('format', '9:16')
+    mode = cfg.get('mode', 'long' if fmt in ('16:9', '1920:1080', '1920:1024', 'laptop', 'long') else 'short')
+    is_long = (mode == 'long' or fmt in ('16:9', '1920:1080', '1920:1024', 'laptop'))
     
     out_prompts = []
     for s in slides:
@@ -38,10 +39,10 @@ def build_prompts(project_dir):
         
         # Build Flow prompt tailored for format
         if is_long:
-            # 1920x1080 Widescreen Landscape formula for laptop & long form
+            # 1920x1024 Widescreen Landscape (16:9) formula for laptop & long form
             prompt_parts = [
                 f"Modern 2D editorial webcomic explainer illustration on a warm off-white cream background ({bg_color}).",
-                "1920x1080 widescreen landscape canvas (16:9 aspect ratio), wide cinematic framing, centered subject."
+                "1920x1024 widescreen landscape canvas (16:9 aspect ratio), wide cinematic framing, centered subject."
             ]
             if top_title:
                 prompt_parts.append(f'At the top center, bold black comic book title: "{top_title}".')
@@ -51,26 +52,28 @@ def build_prompts(project_dir):
             prompt_parts.append(
                 f"Rich stylized 2D background details (subtle room architectural outlines, bookshelves with colorful book spines, framed artwork on walls, modern potted plants, desk lamps, or distant city skyline silhouettes) drawn in fine black ink lines with muted earthy neutral colors (slate gray, soft taupe, olive green, warm wood). "
                 f"Stylized stick-figure characters with oversized round white heads, dot eyes, expressive eyebrows, thin black stick limbs, wearing solid bold primary color shirts (red #DC2626, yellow #EAB308, green #16A34A, blue #2563EB). "
-                f"Thick uniform black ink outlines on characters, flat 2D coloring with zero gradients, soft gray ground shadows, clean comic typography, crisp lines, 16:9 landscape aspect ratio, subject centered with generous breathing room matching background color."
+                f"Thick uniform black ink outlines on characters, flat 2D coloring with zero gradients, soft gray ground shadows, clean comic typography, crisp lines, 1920x1024 16:9 landscape aspect ratio, subject centered with generous breathing room matching background color."
             )
             aspect_ratio = "16:9"
+            target_w, target_h = 1920, 1024
         else:
-            # 1024x1024 Square formula for Phone / Short / Reel (centered on 720x1600 mobile canvas)
+            # 1080x1920 (9:16) Vertical Portrait formula for Phone / Short / Reel
             prompt_parts = [
                 f"Modern 2D editorial webcomic explainer illustration on a warm off-white cream background ({bg_color}).",
-                "1024x1024 square 1:1 composition centered on the frame."
+                "1080x1920 vertical 9:16 full-screen portrait composition filling the tall mobile canvas."
             ]
             if top_title:
                 prompt_parts.append(f'At the top center, bold black comic book title: "{top_title}".')
-            prompt_parts.append(f"In the center composition: {subject} with large prominent expressive characters.")
+            prompt_parts.append(f"In the tall vertical center composition: {subject} with large prominent expressive characters filling the vertical space.")
             if bottom_caption:
                 prompt_parts.append(f'At the bottom center, bold comic book caption: "{bottom_caption}".')
             prompt_parts.append(
-                f"Rich stylized 2D background details (mid-century wooden bookshelf with colorful books, hanging potted indoor plants, framed wall pictures, stylish floor lamp, cozy desk setup) drawn in fine black ink lines and muted earthy neutrals. "
+                f"Rich stylized 2D vertical background details (tall mid-century wooden bookshelf with colorful books, hanging potted indoor plants, framed wall pictures, stylish floor lamp, cozy desk setup) drawn in fine black ink lines and muted earthy neutrals. "
                 f"Stylized stick-figure characters with large oversized round white heads, clear expressive dot eyes and thick eyebrows, thin black stick limbs, wearing solid bold primary color shirts (red #DC2626, yellow #EAB308, green #16A34A, blue #2563EB). "
-                f"Large dynamic figures positioned prominently in the square frame, thick uniform black ink outlines on characters, flat 2D coloring with zero gradients, soft gray ground shadows, clean comic typography, crisp bold lines, 1024x1024 1:1 square aspect ratio, centered subject seamlessly blending into the warm cream background fill."
+                f"Large dynamic figures positioned prominently in the 9:16 vertical frame, thick uniform black ink outlines on characters, flat 2D coloring with zero gradients, soft gray ground shadows, clean comic typography, crisp bold lines, 1080x1920 9:16 vertical portrait framing filling the screen without feeling cramped or shrunken, centered subject seamlessly blending into the warm cream background fill."
             )
-            aspect_ratio = "1:1"  # Generated as 1024x1024 square image
+            aspect_ratio = "9:16"  # Generated as 1080x1920 vertical portrait
+            target_w, target_h = 1080, 1920
 
         prompt = " ".join(prompt_parts)
         
@@ -82,16 +85,18 @@ def build_prompts(project_dir):
             'prompt': prompt,
             'caption': bottom_caption,
             'aspect_ratio': aspect_ratio,
+            'target_width': target_w,
+            'target_height': target_h,
             'short_candidate': s.get('short_candidate', False)
         })
         
-    # If Long-Form: generate SEPARATE 1024x1024 square images for the companion Short!
+    # If Long-Form: generate SEPARATE 1080x1920 (9:16) vertical images for the companion Short!
     if is_long:
         short_candidates = [s for s in slides if s.get('short_candidate') is True]
         if not short_candidates:
             short_candidates = slides[:min(25, len(slides))]
             
-        print(f" -> Generating separate 1024x1024 square prompts for {len(short_candidates)} companion Short slides...")
+        print(f" -> Generating separate 1080x1920 (9:16) vertical prompts for {len(short_candidates)} companion Short slides...")
         for s in short_candidates:
             short_name = f"short_{s['name']}"
             subject = s.get('subject', '').strip().rstrip('.')
@@ -100,17 +105,17 @@ def build_prompts(project_dir):
             
             short_prompt_parts = [
                 f"Modern 2D editorial webcomic explainer illustration on a warm off-white cream background ({bg_color}).",
-                "1024x1024 square 1:1 composition centered on the frame."
+                "1080x1920 vertical 9:16 full-screen portrait composition filling the tall mobile canvas."
             ]
             if top_title:
                 short_prompt_parts.append(f'At the top center, bold black comic book title: "{top_title}".')
-            short_prompt_parts.append(f"In the center composition: {subject} with large prominent expressive characters.")
+            short_prompt_parts.append(f"In the tall vertical center composition: {subject} with large prominent expressive characters filling the vertical space.")
             if bottom_caption:
                 short_prompt_parts.append(f'At the bottom center, bold comic book caption: "{bottom_caption}".')
             short_prompt_parts.append(
-                f"Rich stylized 2D background details (mid-century wooden bookshelf with colorful books, hanging potted indoor plants, framed wall pictures, stylish floor lamp, cozy desk setup) drawn in fine black ink lines and muted earthy neutrals. "
+                f"Rich stylized 2D vertical background details (tall mid-century wooden bookshelf with colorful books, hanging potted indoor plants, framed wall pictures, stylish floor lamp, cozy desk setup) drawn in fine black ink lines and muted earthy neutrals. "
                 f"Stylized stick-figure characters with large oversized round white heads, clear expressive dot eyes and thick eyebrows, thin black stick limbs, wearing solid bold primary color shirts (red #DC2626, yellow #EAB308, green #16A34A, blue #2563EB). "
-                f"Large dynamic figures positioned prominently in the square frame, thick uniform black ink outlines on characters, flat 2D coloring with zero gradients, soft gray ground shadows, clean comic typography, crisp bold lines, 1024x1024 1:1 square aspect ratio, centered subject seamlessly blending into the warm cream background fill."
+                f"Large dynamic figures positioned prominently in the 9:16 vertical frame, thick uniform black ink outlines on characters, flat 2D coloring with zero gradients, soft gray ground shadows, clean comic typography, crisp bold lines, 1080x1920 9:16 vertical portrait framing filling the screen without feeling cramped or shrunken, centered subject seamlessly blending into the warm cream background fill."
             )
             out_prompts.append({
                 'name': short_name,
@@ -121,7 +126,9 @@ def build_prompts(project_dir):
                 'bottom_caption': bottom_caption,
                 'prompt': " ".join(short_prompt_parts),
                 'caption': bottom_caption,
-                'aspect_ratio': '1:1'
+                'aspect_ratio': '9:16',
+                'target_width': 1080,
+                'target_height': 1920
             })
 
     # If Long-Form: generate a dedicated 1920x1080 YouTube Thumbnail prompt in the same art style
@@ -141,12 +148,14 @@ def build_prompts(project_dir):
             'bottom_caption': 'WHY WE CANT LET GO',
             'prompt': thumb_prompt,
             'caption': 'THUMBNAIL',
-            'aspect_ratio': '16:9'
+            'aspect_ratio': '16:9',
+            'target_width': 1920,
+            'target_height': 1080
         })
         print(f" -> Added 1920x1080 YouTube Thumbnail prompt: '{thumb_name}'")
 
     save_json(pdir / 'prompts.json', out_prompts)
-    format_label = "1920x1080 Widescreen (Laptop / Long-Form)" if is_long else "720x1600 Centered (Phone / Short / Reel)"
+    format_label = "1920x1024 Images / 16:9 Widescreen (Laptop / Long-Form)" if is_long else "1080x1920 Images / 9:16 Vertical (Phone / Short / Reel)"
     print(f"\n[Prompts] Generated {len(out_prompts)} prompts [{format_label}] -> {pdir / 'prompts.json'}")
     print(f"Applied style preset: '{preset.get('name', preset_key)}'")
     for p in out_prompts[:5]:

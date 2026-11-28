@@ -1,9 +1,12 @@
 {
   "slug": "psychology-explainer",
   "title": "Editorial Stick Comic Explainer",
-  "format": "720:1600",
+  "format": "9:16",
   "mode": "short",
   "language": "en",
+  "subtitles": {
+    "enabled": true
+  },
   "theme": {
     "background": "#FBF6EF",
     "accent": "#DC2626",
@@ -12,9 +15,9 @@
     "font_family": "'Comic Sans MS', 'Comic Neue', cursive, sans-serif"
   },
   "canvas": {
-    "aspect_ratio": "720:1600",
-    "width": 720,
-    "height": 1600,
+    "aspect_ratio": "9:16",
+    "width": 1080,
+    "height": 1920,
     "canvas_bg": "#FBF6EF",
     "border_radius": 0,
     "shadow": false,

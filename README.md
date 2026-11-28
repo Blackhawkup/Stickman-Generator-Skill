@@ -1,17 +1,21 @@
 # Stickman Explainer Video Generator Skill
 
-An autonomous, high-retention video production skill that creates both **Phone/Reel Shorts (720x1600)** and **Laptop/Long-Form videos (1920x1080)** at 60 FPS, pairing editorial stick-figure illustrations with rich 2D background details, synchronized voice narration, and ducked royalty-free background music.
+A 100% autonomous, zero-input, high-retention video production skill that creates both **Phone/Reel Shorts (1080x1920, 9:16)** and **Laptop/Long-Form videos (1920x1080 HD with 1920x1024 16:9 slides)** at 60 FPS, pairing editorial stick-figure illustrations with **always-on word-highlighted subtitles**, rich 2D background details, synchronized voice narration, and ducked royalty-free background music.
 
-Designed to run in any directory, generating finished deliverables (videos, social captions with 5 hashtags, and 1920x1080 thumbnails) while automatically purging intermediate scratch files.
+Designed to run completely automatically without user prompts—picking the catchiest unproduced topic, generating finished deliverables (videos with burned-in subtitles, social captions with 5 hashtags, and 1920x1080 thumbnails) in the active directory while automatically purging intermediate scratch files.
 
 ---
 
 ## ⚡ Key Highlights
 
-- **⚡ Dual Video Formats & Dedicated 1024x1024 Short Images**:
-  - **Phone / Short / Reel (720 x 1600)**: **1024x1024 square images (1:1)** positioned in the center with matching warm cream (`#FBF6EF`) background fill. Large, prominent characters, zero black bars.
-  - **Laptop / Long-Form (1920 x 1080)**: 16:9 widescreen cinematic framing with rich 2D environmental details.
-  - **Separate Short Images**: In long-form projects, the companion short **generates its own dedicated 1024x1024 square images** (`short_slide_*.png`), never reusing or letterboxing 16:9 widescreen images!
+- **⚡ Dual Video Formats & Exact Pixel Dimensions**:
+  - **Phone / Short / Reel (`9:16` Vertical)**: **1080 × 1920 pixels** (`9:16` vertical) images and 60fps video with large, prominent characters filling the mobile canvas. Zero small images, zero black bars.
+  - **Laptop / Long-Form (`16:9` Widescreen)**: **1920 × 1024 pixels** (`16:9` landscape) slides rendered cleanly inside a **1920 × 1080** HD canvas with rich 2D environmental details and warm cream (`#FBF6EF`) fill.
+  - **Separate Short Images**: In long-form projects, the companion short **generates its own dedicated 1080×1920 (`9:16`) vertical images** (`short_slide_*.png`), never reusing or letterboxing 16:9 widescreen images!
+- **💬 Always-On Word-Synced Subtitles**:
+  - Every generated video (Short, Long-Form, and Companion Short) renders **crisp, high-contrast phrase subtitles** with real-time yellow word highlighting (`#FACC15`) in an ink-bordered slate pill (`rgba(15, 23, 42, 0.90)`), aligned deterministically to Faster-Whisper word timestamps.
+- **🤖 Zero-Input Autonomous Execution**:
+  - Needs **zero user input** throughout production: automatically scores and selects the **catchiest uncompleted topic** (`python tools/cli.py topics next`), writes script + storyboard, generates narration + artwork, normalizes resolutions, renders with subtitles, extracts companion short + thumbnail (if long), cleans up temp files, and updates the topic ledger.
 - **🚨 Mandatory Hook Formula (Name First, Then Imagine)**:
   - **Sentence 1**: Spoken uppercase name of the law/phenomenon (e.g., `THE PRATFALL EFFECT.` or `THE SUNK COST FALLACY.`). The video and narration start with the name!
   - **Sentence 2**: Immediately follows with the scenario starting with `"Imagine a guy..."`, `"Imagine you..."`, or `"Imagine if you..."`.
@@ -26,10 +30,10 @@ Designed to run in any directory, generating finished deliverables (videos, soci
 - **🖼️ Mandatory 1920x1080 YouTube Thumbnail**:
   - Automatically generates an eye-catching, high-CTR 16:9 widescreen thumbnail featuring the uppercase topic title, crimson red hook badge, and expressive editorial stick-figure illustration (`<slug>-thumbnail.png`).
   - Recorded in `<slug>-metadata.json` and `completed_topics.json`. Dedicated CLI command: `python tools/cli.py thumbnail <slug>`.
-- **🎁 Automatic Companion Short**: Producing a 10-minute long-form video automatically renders an accompanying 720x1600 Short (`out/<slug>-short.mp4`) from the opening hook.
+- **🎁 Automatic Companion Short**: Producing a 10-minute long-form video automatically renders an accompanying **1080×1920 (`9:16`)** Short (`out/<slug>-short.mp4`) from the opening hook with synced subtitles.
 - **📝 Social Captions + Exactly 5 Hashtags**: Every generated video automatically produces an engaging caption accompanied by exactly 5 targeted hashtags (`<slug>-caption.txt`).
 - **🧹 Zero-Clutter Auto-Cleanup**: The directory where the agent is run is where deliverables are saved. All intermediate scratch files (`build/`, `voice/`, `images/`, `out_frames/`, raw WAVs) are automatically deleted upon completion.
-- **🎙️ Dual Audio Engine**: Natural conversational TTS voiceover combined with ducked background music (-26 dB) and mastered to -14.0 LUFS.
+- **🎙️ Dual Audio Engine**: Natural conversational TTS voiceover combined with ducked background music (-29 dB) and mastered to -14.0 LUFS.
 
 ---
 
@@ -47,23 +51,24 @@ Stickman-Generator-Skill/
 │   ├── script_long_prompt.md         # 10-minute long-form script formula (7 acts)
 │   ├── storyboard_prompt.md          # Short slide breakdown (mostly ~3s, sometimes ~2s)
 │   ├── storyboard_long_prompt.md     # Long slide breakdown (~130 slides, multi-phase pacing)
-│   ├── image_prompt_template.md      # Flow prompt formula (720x1600 & 1920x1080)
+│   ├── image_prompt_template.md      # Flow prompt formula (1080x1920 & 1920x1024)
 │   └── style_presets.json            # Style presets with rich 2D background details
 ├── engine/
-│   └── slideshow.js                  # Browser 60fps rendering engine (centered + cream fill)
+│   └── slideshow.js                  # Browser 60fps rendering engine + word-synced subtitles
 ├── tools/                            # Production toolchain
-│   ├── cli.py                        # Unified command-line interface
+│   ├── cli.py                        # Unified zero-input command-line interface
+│   ├── images_util.py                # Exact dimension enforcer (1080x1920 & 1920x1024)
 │   ├── metadata.py                   # Caption + 5 hashtags generator
 │   ├── thumbnail.py                  # 1920x1080 High-CTR YouTube Thumbnail generator
 │   ├── cleanup.py                    # Automatic scratch file cleanup utility
 │   ├── check.py                      # Pacing validation (mostly ~3s, sometimes ~2s)
-│   ├── extract_short.py              # Automatic companion short generator (720x1600)
-│   ├── prompts.py                    # Slide prompt compiler (1920x1080, 720x1600 & thumbnail)
-│   ├── voice.py                      # TTS generator & Whisper word-clock alignment
+│   ├── extract_short.py              # Automatic companion short generator (1080x1920, 9:16)
+│   ├── prompts.py                    # Slide prompt compiler (1920x1024, 1080x1920 & thumbnail)
+│   ├── voice.py                      # TTS generator with retry & Whisper word-clock alignment
 │   ├── mix.py                        # Sophisticated music selection & crossfade looping (-29dB)
-│   ├── build.py                      # HTML web player generator (full cream fill, no black bars)
+│   ├── build.py                      # HTML web player generator (subtitles + cream fill)
 │   ├── render.py                     # Parallel Playwright frame capturer + FFmpeg
-│   └── topics.py                     # Topic queue & deduplication manager
+│   └── topics.py                     # Catchiest-topic selector & deduplication manager
 ├── topics/
 │   ├── example_topics.json           # Queue of viral ideas waiting to be made
 │   ├── completed_topics.json         # Permanent ledger of finished videos & tracks used
@@ -104,16 +109,18 @@ playwright install chromium
 ## 🛠️ CLI Quick Reference
 
 ```bash
-# 1. Create a Phone Short project (720x1600)
-python tools/cli.py new my-short --mode short
+# 1. Auto-pick the catchiest uncompleted topic & create a Short (1080x1920, 9:16)
+python tools/cli.py new --mode short
 
-# 2. Create a Laptop Long-Form project (1920x1080)
-python tools/cli.py new my-deepdive --mode long
+# 2. Auto-pick the catchiest uncompleted topic & create a Long-Form project (1920x1024 images, 1920x1080 video)
+python tools/cli.py new --mode long
 
-# 3. Compile prompts (16:9 + thumbnail for long, centered for phone)
+# (Or provide an explicit slug: python tools/cli.py new my-topic --mode short)
+
+# 3. Compile prompts (1920x1024 16:9 + thumbnail + 1080x1920 companion short for long; 1080x1920 9:16 for short)
 python tools/cli.py prompts <slug>
 
-# 4. Generate TTS voiceover and Whisper word timestamps
+# 4. Generate TTS voiceover and Whisper word timestamps (powers word-highlighted subtitles)
 python tools/cli.py tts <slug> --voice Charon
 
 # 5. Validate timing & pacing rules (mostly ~3s, sometimes ~2s)
@@ -123,7 +130,8 @@ python tools/cli.py check <slug>
 python tools/cli.py thumbnail <slug>
 
 # 7. 1-Command Autonomous Production
-# - Generates primary video + companion short (if long) + thumbnail (if long)
+# - Normalizes image resolutions (1080x1920 short / 1920x1024 long)
+# - Renders subtitled primary video + subtitled companion short (if long) + thumbnail (if long)
 # - Selects aesthetic lo-fi / ambient documentary soundtrack & crossfades
 # - Generates social caption + 5 hashtags
 # - Cleans up all intermediate scratch files automatically

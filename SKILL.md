@@ -1,15 +1,15 @@
 ---
 name: stickman-generator
-description: Autonomous end-to-end production of stick-figure explainer slideshow videos in both Phone/Reels (720x1600) and Laptop/Long-Form (1920x1080) formats, featuring synchronized voice narration, editorial webcomic styling with rich 2D background details, dynamic royalty-free background music rotation across 12 catalog tracks, strict retention pacing (mostly ~3s, sometimes ~2s; 5-6s after 2m in long form), mandatory "Imagine..." hook architecture, automatic companion short generation, social captions with 5 hashtags, 1920x1080 YouTube thumbnail generation, and automatic cleanup of intermediate scratch files. Use when asked to generate, script, storyboard, render, or produce stickman explainer shorts or long-form slideshow videos.
+description: Zero-input autonomous end-to-end production of stick-figure explainer slideshow videos in both Phone/Reels (1080x1920, 9:16 vertical) and Laptop/Long-Form (1920x1024 16:9 images on 1920x1080 HD video) formats. Features always-on word-highlighted synced subtitles on every video, automatic selection of the catchiest uncompleted topic without repeats, synchronized voice narration, editorial webcomic styling with rich 2D background details, dynamic modern ambient music rotation across 12 tracks, strict retention pacing (mostly ~3s, sometimes ~2s; 5-6s after 2m in long form), mandatory Name-First then Imagine hook architecture, automatic companion 9:16 short generation, social captions with 5 hashtags, 1920x1080 YouTube thumbnail generation, and automatic cleanup of intermediate scratch files. Use when asked to generate, script, storyboard, render, or produce stickman explainer shorts or long-form slideshow videos.
 ---
 
 # Stickman Slideshow Explainer Generator
 
-A streamlined, high-speed autonomous explainer video production system that synchronizes editorial stick-figure comic illustrations with voice narration and ducked background music.
+A streamlined, 100% autonomous explainer video production system that automatically selects the catchiest unproduced topic, synchronizes editorial stick-figure comic illustrations with voice narration, dynamic word-highlighted subtitles, and ducked background music—requiring **zero user inputs** throughout the pipeline.
 
 Supports two distinct production modes:
-1. **Phone / Short / Reel Mode**: **720 x 1600** vertical video, centered with matching warm cream background fill (`#FBF6EF`). Zero black bars.
-2. **Laptop / Long-Form Mode**: **1920 x 1080** widescreen video (16:9), which **automatically generates a companion 720x1600 Short** from the opening hook and a matching **1920x1080 YouTube thumbnail**!
+1. **Phone / Short / Reel Mode**: **1080 x 1920 pixels (`9:16` vertical portrait)** video and images, synced word-highlighted subtitles, and matching warm cream background (`#FBF6EF`). Zero black bars.
+2. **Laptop / Long-Form Mode**: **1920 x 1080 (`16:9` widescreen)** video with **1920 x 1024 (`16:9`)** artwork, synced subtitles, which **automatically generates a companion 1080x1920 (`9:16`) Short** from the opening hook and a matching **1920x1080 YouTube thumbnail**!
 
 ---
 
@@ -102,18 +102,26 @@ For every long-format video, a dedicated 1920x1080 YouTube thumbnail **MUST ALWA
 
 ---
 
-## 🎨 Visual DNA, Canvas & 1024x1024 Short Images
+## 🎨 Visual DNA, Canvas & Synced Subtitles
 
-### 1. Canvas Dimensions & Dedicated 1024x1024 Square Generation
+### 1. Canvas Dimensions & Exact Image Resolutions
 | Mode | Video Canvas Dimensions | Image Resolution & Aspect Ratio | Layout & Background Fill |
 |---|---|---|---|
-| **Phone / Short / Reel** | **720 x 1600** (Vertical) | **1024 x 1024** (`1:1` Square) | Centered 1024x1024 artwork; warm cream (`#FBF6EF`) seamless fill |
-| **Companion Short (Long-Form)** | **720 x 1600** (Vertical) | **1024 x 1024** (`1:1` Square) | Generated **SEPARATELY** as dedicated 1024x1024 square images (`short_slide_*.png`) |
-| **Laptop / Long-Form** | **1920 x 1080** (Widescreen 16:9) | **1920 x 1080** (`16:9` Landscape) | Full 16:9 cinematic framing with warm cream (`#FBF6EF`) |
-| **YouTube Thumbnail** | **1920 x 1080** (Widescreen 16:9) | **1920 x 1080** (`16:9` Landscape) | High-contrast dramatic thumbnail with large topic title |
+| **Phone / Short / Reel** | **1080 x 1920** (`9:16` Vertical) | **1080 x 1920** (`9:16` Vertical) | Full-height vertical portrait; warm cream (`#FBF6EF`) seamless fill |
+| **Companion Short (Long-Form)** | **1080 x 1920** (`9:16` Vertical) | **1080 x 1920** (`9:16` Vertical) | Generated **SEPARATELY** as dedicated `1080x1920` (`9:16`) vertical images (`short_slide_*.png`) |
+| **Laptop / Long-Form** | **1920 x 1080** (`16:9` Widescreen) | **1920 x 1024** (`16:9` Landscape) | Centered `1920x1024` artwork inside `1920x1080` HD canvas with warm cream (`#FBF6EF`) fill |
+| **YouTube Thumbnail** | **1920 x 1080** (`16:9` Widescreen) | **1920 x 1080** (`16:9` Landscape) | High-contrast dramatic thumbnail with large topic title |
 
 > [!IMPORTANT]
-> **1024x1024 Images in Shorts**: All short images (and companion short images) are generated at **1024x1024** (`1:1` square aspect ratio). In the 720x1600 mobile viewport, the image sits prominently in the center, and the top and bottom canvas seamlessly fill with the exact matching background cream color (`#FBF6EF`). In long-form projects, the companion short NEVER reuses the 16:9 widescreen images; separate 1024x1024 square images are generated specifically for the short. Zero distorted images, zero black bars.
+> **Exact Dimensions & Separate Short Artwork**:
+> - **Shorts (`9:16`)**: Generated and normalized to exact **1080 × 1920 pixels (`9:16` vertical)**. Characters and scenes fill the tall portrait screen without shrinking or black bars.
+> - **Long-Form (`16:9`)**: Slide images are generated and normalized to exact **1920 × 1024 pixels (`16:9` landscape)**, leaving clean cream margins at the bottom of the 1920x1080 HD frame for synced subtitles.
+> - **Companion Short**: NEVER reuses 16:9 widescreen images; separate `1080x1920` (`9:16`) images are always generated specifically for the companion short.
+
+### 2. Always-On Synced Subtitles
+- **Every generated video** (Short, Long-Form, and Companion Short) includes **word-highlighted phrase subtitles** automatically synced to `voice/words.json`.
+- Rendered deterministically at 60 FPS inside `engine/slideshow.js` in a high-contrast slate pill (`rgba(15, 23, 42, 0.90)`) with white text and bright yellow (`#FACC15`) active spoken word highlighting.
+- Automatically positioned in the mobile safe zone (`bottom: 11%` on `1080x1920`) and bottom subtitle zone (`bottom: 30px` on `1920x1080`).
 
 ### 2. Slide 01 Opening Rule (Title Card)
 - **Slide 01** is the viewer's very first impression. It MUST be a compelling, high-CTR **Title Card**.
@@ -147,16 +155,21 @@ For every long-format video, a dedicated 1920x1080 YouTube thumbnail **MUST ALWA
 ## 🛠️ CLI Quick Reference
 
 ```bash
-# Initialize a Short (720x1600 phone format)
-python tools/cli.py new my-short --mode short
+# Auto-pick the catchiest uncompleted topic and initialize project
+python tools/cli.py new --mode short            # 1080x1920 (9:16 vertical)
+python tools/cli.py new --mode long             # 1920x1080 HD video (1920x1024 16:9 images)
 
-# Initialize a 10-minute Long-Form video (1920x1080 widescreen)
+# Or specify an explicit slug
+python tools/cli.py new my-short --mode short
 python tools/cli.py new my-deepdive --mode long
 
-# Compile prompts (16:9 + thumbnail for long, centered for phone)
+# Inspect catchiest available topic (zero repeats against completed_topics.json)
+python tools/cli.py topics next
+
+# Compile prompts (1920x1024 16:9 + 1920x1080 thumbnail + 1080x1920 companion short; or 1080x1920 short)
 python tools/cli.py prompts <slug>
 
-# Generate TTS voiceover and Whisper word timestamps
+# Generate TTS voiceover and Whisper word timestamps (powers synced subtitles)
 python tools/cli.py tts <slug> --voice Charon
 
 # Validate timing & pacing rules (mostly ~3s, sometimes ~2s)
@@ -166,7 +179,8 @@ python tools/cli.py check <slug>
 python tools/cli.py thumbnail <slug>
 
 # 1-Command Autonomous Production
-# - Generates primary video + companion short (if long) + thumbnail (if long)
+# - Generates narration + artwork + enforces exact 1080x1920 / 1920x1024 resolutions
+# - Renders subtitled primary video + companion 1080x1920 short (if long) + 1920x1080 thumbnail (if long)
 # - Generates social caption + 5 hashtags
 # - Cleans up all intermediate scratch files automatically
 # - Updates topics/completed_topics.json
@@ -175,23 +189,26 @@ python tools/cli.py auto <slug>
 
 ---
 
-## 🚀 Autonomous Production Protocol
+## 🤖 Zero-Input Autonomous Production Protocol (Strict Requirement)
 
-When the user asks for a video:
+The agent MUST operate **100% automatically with zero user questions or confirmations** once the user asks for a Short or Long-Form video:
+
 1. **Determine Mode & Directory**:
-   - Short Mode (`720x1600`) vs Long-Form Mode (`1920x1080`).
-   - Run in the current working directory where the user executes the agent.
-2. **Fetch Topic**: Run `python tools/cli.py topics next` and confirm it is uncompleted.
-3. **Draft Script**:
-   - For Short: Use `prompts/script_prompt.md`.
-   - For Long-Form: Use `prompts/script_long_prompt.md`.
+   - Infer **Short Mode** (`1080x1920`, `9:16`) or **Long-Form Mode** (`1920x1080` video with `1920x1024` `16:9` images) from the user prompt. Default to `short` if unspecified.
+   - Run directly in the active working directory where the user executes the agent.
+2. **Automatically Pick the Catchiest Uncompleted Topic (No User Prompt Needed)**:
+   - Run `python tools/cli.py new --mode <short|long>` (without asking the user for a topic!). It automatically scores and picks the catchiest uncompleted topic via `topics.get_best_topic()`, verified against `topics/completed_topics.json` so there are zero repeats.
+   - If the user named a specific topic, verify it isn't a repeat; if `example_topics.json` is empty, immediately brainstorm a highly catchy psychology/paradox concept, add it via `tools/topics.py add`, and proceed immediately without pausing.
+3. **Draft Script Immediately (Zero Approval Loops)**:
+   - Short Mode: Follow `prompts/script_prompt.md`.
+   - Long-Form Mode: Follow `prompts/script_long_prompt.md`.
    - **Enforce**: Sentence 1 = `[TITLE].`, Sentence 2 = `Imagine [a guy / you / if you]...` (no named fiction characters).
-4. **Storyboard**:
-   - Enforce mostly ~3s, sometimes ~2s (~20-25 slides in a short).
-   - In long form, slides after minute 2 stay for 5–6 seconds.
+4. **Storyboard Automatically**:
+   - Enforce mostly ~3s, sometimes ~2s (~20-25 slides in minute 1; 5–6s after minute 2 in long form).
    - Slide 01 MUST be a rich Title Card (never a plain walking stickman).
 5. **Execute Auto Pipeline**: Run `python tools/cli.py auto <slug>`.
-   - Produces video(s), caption + 5 hashtags, and thumbnail (for long).
+   - Produces subtitled MP4 video(s), companion `1080x1920` short (if long), `1920x1080` thumbnail (if long), and caption + 5 hashtags.
+   - Automatically normalizes all images to exact `1080x1920` (short) and `1920x1024` (long).
    - Automatically purges scratch folders (`build/`, `voice/`, `images/`).
-   - Updates `topics/completed_topics.json`.
-6. **Deliver**: Present clickable links to the finished MP4(s), thumbnail image, and caption text.
+   - Automatically updates `topics/completed_topics.json`.
+6. **Deliver Final Product**: Present clickable links to the finished subtitled MP4(s), thumbnail image (for long-form), and social caption + 5 hashtags.

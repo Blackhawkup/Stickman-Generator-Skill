@@ -15,13 +15,15 @@ except ImportError:
 def get_dimensions(fmt):
     """Resolves width and height for format."""
     f = str(fmt).lower()
-    if f in ('720:1600', '720x1600', 'phone', 'short', 'reel', 'reels', '9:16'):
+    if f in ('1080:1920', '1080x1920', '9:16', 'phone', 'short', 'reel', 'reels'):
+        return 1080, 1920
+    if f in ('720:1600', '720x1600'):
         return 720, 1600
-    if f in ('16:9', '1920:1080', '1920x1080', 'laptop', 'long', 'desktop', 'wide'):
+    if f in ('16:9', '1920:1080', '1920x1080', '1920:1024', '1920x1024', 'laptop', 'long', 'desktop', 'wide'):
         return 1920, 1080
     if f in ('1:1', 'square'):
         return 1080, 1080
-    return 720, 1600
+    return 1080, 1920
 
 
 def build_page(pdir):
@@ -29,9 +31,16 @@ def build_page(pdir):
     cfg = load_json(pdir / 'film.json')
     slides = load_json(pdir / 'slides.json')
     
-    fmt = cfg.get('format', '720:1600')
+    fmt = cfg.get('format', '9:16')
     W, H = get_dimensions(fmt)
     
+    # Ensure images match exact target dimensions before building viewer
+    try:
+        import images_util
+        images_util.normalize_project_images(pdir)
+    except Exception as e:
+        print(f"[Build] Note during image normalization: {e}")
+
     theme = cfg.get('theme', {})
     bg_color = theme.get('canvas_bg', theme.get('background', '#FBF6EF'))
     if str(bg_color).lower() in ('#000', '#000000', 'black'):
@@ -63,6 +72,7 @@ def build_page(pdir):
         'format': fmt,
         'theme': theme,
         'canvas': canvas_cfg,
+        'subtitles': cfg.get('subtitles', {'enabled': True}),
         'transitions': cfg.get('transitions', {'default_type': 'cut', 'fade_duration': 0.0, 'ken_burns_zoom': 1.0})
     }
     (bdir / 'film.js').write_text(f"window.FILM = {json.dumps(film_data, indent=2)};\n", encoding='utf-8')

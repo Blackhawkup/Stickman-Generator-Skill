@@ -57,10 +57,66 @@ def is_topic_completed(name_or_slug):
     return False
 
 
-def get_next_topic():
+def score_topic_catchiness(item):
+    """Scores an unproduced topic candidate by hook curiosity, paradox, contrast, and broad appeal."""
+    if not item:
+        return 0.0
+    score = float(item.get('priority', 0) or 0) * 10.0
+    text = " ".join([
+        str(item.get('topic', '')),
+        str(item.get('hook_scenario', '')),
+        str(item.get('core_concept', '')),
+        str(item.get('category', ''))
+    ]).lower()
+
+    # Curiosity & paradox hooks
+    high_ctr_cues = [
+        'paradox', 'effect', 'bias', 'fallacy', 'law', 'illusion', 'twice as much',
+        'suddenly', 'secret', 'convinced', 'ignores', 'never', 'actually', 'opposite',
+        'mistake', 'flaw', 'reward', 'money', 'cost', 'nobody', 'everyone', 'brain',
+        'genius', 'stupid', 'expert', 'procrastin', 'overestimate', 'steal', 'blind'
+    ]
+    for cue in high_ctr_cues:
+        if cue in text:
+            score += 2.0
+
+    # Reward concrete relatable scenarios and numbers/contrasts
+    if re.search(r'\d+', item.get('hook_scenario', '')):
+        score += 2.5
+    if any(w in text for w in ('you ', 'your ', 'everyone', 'people')):
+        score += 1.5
+    if item.get('hook_scenario'):
+        score += 3.0
+    if item.get('researcher'):
+        score += 1.5
+    return score
+
+
+def get_best_topic():
+    """Automatically selects the catchiest uncompleted topic without repeats."""
     completed = {norm_str(x.get('topic', '')) for x in get_completed_topics()}
     completed.update(norm_str(x.get('slug', '')) for x in get_completed_topics())
-    
+
+    candidates = []
+    for idx, item in enumerate(get_example_topics()):
+        t_norm = norm_str(item.get('topic', ''))
+        s_norm = norm_str(item.get('slug', ''))
+        if t_norm not in completed and s_norm not in completed:
+            candidates.append((score_topic_catchiness(item), -idx, item))
+
+    if not candidates:
+        return None
+    candidates.sort(key=lambda x: (x[0], x[1]), reverse=True)
+    return candidates[0][2]
+
+
+def get_next_topic(catchiest=True):
+    """Returns the catchiest uncompleted topic (default) or the first queued uncompleted topic."""
+    if catchiest:
+        return get_best_topic()
+    completed = {norm_str(x.get('topic', '')) for x in get_completed_topics()}
+    completed.update(norm_str(x.get('slug', '')) for x in get_completed_topics())
+
     for item in get_example_topics():
         t_norm = norm_str(item.get('topic', ''))
         s_norm = norm_str(item.get('slug', ''))
@@ -131,7 +187,8 @@ def main():
     parser = argparse.ArgumentParser(description="Manage explainer topics and deduplication ledger")
     subparsers = parser.add_subparsers(dest="command")
 
-    subparsers.add_parser("next", help="Get the next unproduced candidate topic")
+    subparsers.add_parser("next", help="Get the catchiest unproduced candidate topic (no repeats)")
+    subparsers.add_parser("best", help="Alias for 'next': pick the most catchy unproduced topic")
     subparsers.add_parser("list", help="List all candidate topics that have not been produced")
     subparsers.add_parser("completed", help="List all produced topics")
 
@@ -144,8 +201,8 @@ def main():
 
     args = parser.parse_args()
 
-    if args.command == "next":
-        nxt = get_next_topic()
+    if args.command in ("next", "best"):
+        nxt = get_best_topic()
         if nxt:
             print(json.dumps(nxt, indent=2))
         else:

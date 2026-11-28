@@ -1,12 +1,14 @@
 /* Slideshow Engine: Deterministic, seek-driven, timed to narration.
-   Supports centered presentation with matching background fill for 720x1600 (phone) and 1920x1080 (laptop). */
+   Supports centered presentation with matching background fill for 1080x1920 (phone 9:16) and 1920x1080 (laptop 16:9),
+   plus synced high-contrast phrase subtitles rendered across every video. */
 (function () {
   const FILM = window.FILM || {};
   const WORDS = window.WORDS || [];
   const SLIDES = window.SLIDES || [];
-  const W = FILM.W || 720;
-  const H = FILM.H || 1600;
-  const FORMAT = FILM.format || '720:1600';
+  const W = FILM.W || 1080;
+  const H = FILM.H || 1920;
+  const FORMAT = FILM.format || '9:16';
+  const SUBTITLES_ENABLED = !(FILM.subtitles && FILM.subtitles.enabled === false);
   const CANVAS_CFG = FILM.canvas || {};
   let CANVAS_BG = CANVAS_CFG.canvas_bg || (FILM.theme && FILM.theme.canvas_bg) || (FILM.theme && FILM.theme.background) || '#FBF6EF';
   if (CANVAS_BG === '#000000' || CANVAS_BG === '#000' || CANVAS_BG.toLowerCase() === 'black') {
@@ -158,6 +160,141 @@
     });
   }
 
+  // Build Synced Word-Highlighted Subtitle Cues
+  function buildSubtitleCues(words) {
+    if (!SUBTITLES_ENABLED || !words || !words.length) return [];
+    const isPortrait = H > W;
+    const maxWords = isPortrait ? 4 : 6;
+    const maxChars = isPortrait ? 28 : 48;
+    const cues = [];
+    let buf = [];
+    let charCount = 0;
+
+    function flush() {
+      if (!buf.length) return;
+      cues.push({
+        start: buf[0].s,
+        end: buf[buf.length - 1].e,
+        words: buf
+      });
+      buf = [];
+      charCount = 0;
+    }
+
+    for (let i = 0; i < words.length; i++) {
+      const w = words[i];
+      const text = (w.w || '').trim();
+      if (!text) continue;
+
+      if (buf.length > 0) {
+        const gap = w.s - buf[buf.length - 1].e;
+        if (gap > 0.38 || buf.length >= maxWords || (charCount + text.length + 1) > maxChars) {
+          flush();
+        }
+      }
+
+      buf.push({ w: text, s: Number(w.s) || 0, e: Number(w.e) || 0 });
+      charCount += text.length + 1;
+
+      if (/[.!?,;:]$/.test(text)) {
+        flush();
+      }
+    }
+    flush();
+
+    // Extend cue end slightly across tiny breath gaps so subtitles read smoothly without flickering
+    for (let i = 0; i < cues.length; i++) {
+      const nextStart = (i + 1 < cues.length) ? cues[i + 1].start : (cues[i].end + 0.35);
+      cues[i].displayEnd = Math.min(nextStart - 0.01, cues[i].end + 0.40);
+    }
+    return cues;
+  }
+
+  const subtitleCues = buildSubtitleCues(WORDS);
+  const viewport = document.getElementById('viewport') || document.body;
+  let subOverlay = null;
+  if (SUBTITLES_ENABLED && subtitleCues.length > 0) {
+    const isPortrait = H > W;
+    const fontSize = isPortrait ? Math.round(W * 0.042) : Math.round(H * 0.034);
+    const bottomPos = isPortrait ? `${Math.round(H * 0.11)}px` : '30px';
+    const maxWidth = isPortrait ? '88%' : '78%';
+
+    subOverlay = document.createElement('div');
+    subOverlay.id = 'subtitle-overlay';
+    subOverlay.style.cssText = `
+      position: absolute;
+      left: 50%;
+      bottom: ${bottomPos};
+      transform: translateX(-50%);
+      max-width: ${maxWidth};
+      z-index: 25;
+      pointer-events: none;
+      display: none;
+      text-align: center;
+    `;
+    subOverlay.innerHTML = `<div id="subtitle-pill" style="
+      display: inline-block;
+      background: rgba(15, 23, 42, 0.90);
+      border: 3px solid #0F172A;
+      border-radius: 14px;
+      padding: ${isPortrait ? '12px 24px' : '10px 22px'};
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.24);
+      font-family: 'Inter', 'Segoe UI', 'Arial Rounded MT Bold', system-ui, sans-serif;
+      font-size: ${fontSize}px;
+      font-weight: 800;
+      line-height: 1.3;
+      color: #FFFFFF;
+      letter-spacing: 0.01em;
+    "></div>`;
+    viewport.appendChild(subOverlay);
+  }
+
+  let lastCueIdx = -2;
+  let lastWordIdx = -2;
+
+  function renderSubtitles(timeInSeconds) {
+    if (!subOverlay || !subtitleCues.length) return;
+    let cueIdx = -1;
+    for (let i = 0; i < subtitleCues.length; i++) {
+      const c = subtitleCues[i];
+      if (timeInSeconds >= c.start && timeInSeconds <= c.displayEnd) {
+        cueIdx = i;
+        break;
+      }
+    }
+
+    if (cueIdx === -1) {
+      if (lastCueIdx !== -1) {
+        subOverlay.style.display = 'none';
+        lastCueIdx = -1;
+        lastWordIdx = -1;
+      }
+      return;
+    }
+
+    const cue = subtitleCues[cueIdx];
+    let activeWordIdx = -1;
+    for (let j = 0; j < cue.words.length; j++) {
+      if (timeInSeconds >= cue.words[j].s) {
+        activeWordIdx = j;
+      }
+    }
+
+    if (cueIdx === lastCueIdx && activeWordIdx === lastWordIdx) {
+      return;
+    }
+
+    const pill = subOverlay.firstElementChild;
+    pill.innerHTML = cue.words.map((w, idx) => {
+      const color = (idx === activeWordIdx) ? '#FACC15' : '#FFFFFF';
+      return `<span style="color:${color};">${w.w.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`;
+    }).join(' ');
+
+    subOverlay.style.display = 'block';
+    lastCueIdx = cueIdx;
+    lastWordIdx = activeWordIdx;
+  }
+
   // Active seek function called by Playwright renderer & live preview
   let activeSlideIdx = -1;
   window.__seek = function (timeInSeconds) {
@@ -208,6 +345,7 @@
       }
     }
 
+    renderSubtitles(timeInSeconds);
     activeSlideIdx = currentIdx;
   };
 

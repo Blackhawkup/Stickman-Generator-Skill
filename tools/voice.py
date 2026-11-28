@@ -59,15 +59,30 @@ def tts_generate(pdir, voice='Charon', style=None, text=None):
                 'speechConfig': {'voiceConfig': {'prebuiltVoiceConfig': {'voiceName': voice}}}
             }
         }
-        req = urllib.request.Request(
-            f'https://generativelanguage.googleapis.com/v1beta/models/{TTS_MODEL}:generateContent',
-            data=json.dumps(body).encode(),
-            headers={'content-type': 'application/json', 'x-goog-api-key': k}
-        )
-        try:
-            r = json.load(urllib.request.urlopen(req, timeout=300))
-        except urllib.error.HTTPError as e:
-            die(f"Google AI Studio refused this take ({e.code}): {e.read().decode()[:300]}")
+        import time
+        r = None
+        for attempt in range(3):
+            req = urllib.request.Request(
+                f'https://generativelanguage.googleapis.com/v1beta/models/{TTS_MODEL}:generateContent',
+                data=json.dumps(body).encode(),
+                headers={'content-type': 'application/json', 'x-goog-api-key': k}
+            )
+            try:
+                r = json.load(urllib.request.urlopen(req, timeout=300))
+                break
+            except urllib.error.HTTPError as e:
+                err_txt = e.read().decode()[:300]
+                if e.code in (429, 500, 502, 503, 504) and attempt < 2:
+                    wait_s = 3 * (attempt + 1)
+                    print(f"  [TTS] Transient HTTP {e.code} on piece {i + 1}, retrying in {wait_s}s...")
+                    time.sleep(wait_s)
+                    continue
+                die(f"Google AI Studio refused this take ({e.code}): {err_txt}")
+            except Exception as e:
+                if attempt < 2:
+                    time.sleep(3)
+                    continue
+                die(f"Google AI Studio connection failed on piece {i + 1}: {e}")
         part = next(p for p in r['candidates'][0]['content']['parts'] if 'inlineData' in p)
         rate = int((re.search(r'rate=(\d+)', part['inlineData'].get('mimeType', '')) or [0, 24000])[1])
         f = vdir / f'take-{i + 1:02d}.wav'

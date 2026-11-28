@@ -1,6 +1,9 @@
 import { copyFileSync, existsSync, readFileSync } from 'node:fs';
-import { resolve, join } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { execFileSync } from 'node:child_process';
+import { resolve, join, dirname } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 async function main() {
   const arg = process.argv[2] || 'sunk-cost-fallacy';
@@ -66,38 +69,46 @@ async function main() {
       }
     };
 
-    try {
-      const files = await flow.runGeneration(job);
-      console.log(` -> Generated:`, files);
-      for (const f of files) {
-        if (f.endsWith('.jpeg')) {
-          copyFileSync(f, pngPath);
-        } else if (f.endsWith('.png')) {
-          copyFileSync(f, jpegPath);
-        }
-      }
-      
-      // If thumbnail, also copy to project root
-      if (s.type === 'thumbnail') {
-        const thumbDest = join(projectDir, `${s.name}.png`);
-        try { copyFileSync(pngPath, thumbDest); } catch {}
-        console.log(` -> Preserved thumbnail at: ${thumbDest}`);
-      }
-      console.log(` -> Verified both .png and .jpeg for ${s.name}`);
-    } catch (err) {
-      console.error(` -> FAILED to generate ${s.name}:`, err.message || err);
-      // Retry once after brief pause
+    let succeeded = false;
+    for (let attempt = 1; attempt <= 2 && !succeeded; attempt++) {
       try {
-        console.log(` -> Retrying ${s.name} once...`);
         const files = await flow.runGeneration(job);
-        console.log(` -> Retry successful:`, files);
+        console.log(` -> Generated:`, files);
         for (const f of files) {
-          if (f.endsWith('.jpeg')) copyFileSync(f, pngPath);
+          if (f.endsWith('.jpeg')) {
+            copyFileSync(f, pngPath);
+          } else if (f.endsWith('.png')) {
+            copyFileSync(f, jpegPath);
+          }
         }
-      } catch (retryErr) {
-        console.error(` -> Retry also failed for ${s.name}:`, retryErr.message || retryErr);
+
+        // If thumbnail, also copy to project root
+        if (s.type === 'thumbnail') {
+          const thumbDest = join(projectDir, `${s.name}.png`);
+          try { copyFileSync(pngPath, thumbDest); } catch {}
+          console.log(` -> Preserved thumbnail at: ${thumbDest}`);
+        }
+        console.log(` -> Verified both .png and .jpeg for ${s.name}`);
+        succeeded = true;
+      } catch (err) {
+        console.error(` -> Attempt ${attempt} FAILED for ${s.name}:`, err.message || err);
+        if (attempt < 2) {
+          console.log(` -> Waiting 3s before retrying ${s.name}...`);
+          await new Promise(r => setTimeout(r, 3000));
+        }
       }
     }
+  }
+
+  // Enforce exact pixel resolutions: 1080x1920 (9:16 short), 1920x1024 (16:9 long), 1920x1080 (thumbnail)
+  try {
+    const normScript = join(__dirname, 'images_util.py');
+    const venvPy = join(process.env.WHITEBOARD_HOME || join(process.env.USERPROFILE || process.env.HOME || '', 'WhiteboardFilms'), '.tools', 'venv', process.platform === 'win32' ? 'Scripts/python.exe' : 'bin/python');
+    const pyBin = existsSync(venvPy) ? venvPy : 'python';
+    console.log(`\n[Batch Generator] Normalizing generated image resolutions...`);
+    execFileSync(pyBin, [normScript, projectDir], { stdio: 'inherit' });
+  } catch (normErr) {
+    console.warn(`[Batch Generator] Image dimension normalization note:`, normErr.message || normErr);
   }
 
   console.log(`\n[Batch Generator] Finished all prompts.`);
