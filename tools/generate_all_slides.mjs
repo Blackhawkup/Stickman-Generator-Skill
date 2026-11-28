@@ -1,5 +1,6 @@
 import { copyFileSync, existsSync, readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { homedir } from 'node:os';
 import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -25,8 +26,18 @@ async function main() {
 
   const prompts = JSON.parse(readFileSync(promptsFile, 'utf-8'));
 
-  // Import flow-mcp
-  const flowUrl = pathToFileURL('C:/Users/sangw/flow-mcp/dist/flow.js').href;
+  // Import flow-mcp (supports FLOW_MCP_PATH env var or ~/flow-mcp/dist/flow.js)
+  const flowCandidates = [
+    process.env.FLOW_MCP_PATH,
+    join(homedir(), 'flow-mcp', 'dist', 'flow.js'),
+    'C:/Users/sangw/flow-mcp/dist/flow.js'
+  ].filter(Boolean);
+  const flowEntry = flowCandidates.find(p => existsSync(p));
+  if (!flowEntry) {
+    console.error('[Batch Generator] flow-mcp not found. Set FLOW_MCP_PATH or install flow-mcp at ~/flow-mcp/dist/flow.js');
+    process.exit(1);
+  }
+  const flowUrl = pathToFileURL(flowEntry).href;
   const flow = await import(flowUrl);
 
   console.log(`[Batch Generator] Starting generation for ${prompts.length} items in ${projectDir}...`);

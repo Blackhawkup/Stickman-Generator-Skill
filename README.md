@@ -85,28 +85,104 @@ Stickman-Generator-Skill/
 
 ---
 
-## 🚀 Quickstart & Prerequisites
+## 🚀 Complete Installation & Setup Guide
 
-### 1. Requirements
+### 1. Prerequisites
 
-- **Python**: 3.10 or higher
-- **Node.js**: 18.0 or higher
-- **FFmpeg**: Installed and accessible in your system PATH
-- **Google Flow MCP**: Configured in your agent environment (for `flow_agent_images`)
-
-### 2. Install Dependencies
-
-```bash
-# Python dependencies
-pip install -r requirements.txt
-
-# Install Playwright browser binaries
-playwright install chromium
-```
+Ensure the following tools are installed on your system:
+- **Git**
+- **Python 3.10 or higher**
+- **Node.js 18.0 or higher**
+- **FFmpeg** installed and available in your system `PATH`:
+  - **Windows**: `winget install Gyan.FFmpeg` (then restart your terminal)
+  - **macOS**: `brew install ffmpeg`
+  - **Linux (Ubuntu/Debian)**: `sudo apt update && sudo apt install ffmpeg`
+- **Google Flow MCP** (`flow-mcp`) configured and signed in to Google Flow (for AI comic artwork via `flow_agent_images`).
 
 ---
 
-## 🛠️ CLI Quick Reference
+### 2. Clone & Install as an Antigravity Skill
+
+Install globally so the skill is available in **any project or directory**:
+
+#### Windows (PowerShell)
+```powershell
+git clone https://github.com/Blackhawkup/Stickman-Generator-Skill.git "$env:USERPROFILE\.gemini\config\skills\stickman-generator"
+cd "$env:USERPROFILE\.gemini\config\skills\stickman-generator"
+```
+
+#### macOS / Linux
+```bash
+git clone https://github.com/Blackhawkup/Stickman-Generator-Skill.git ~/.gemini/config/skills/stickman-generator
+cd ~/.gemini/config/skills/stickman-generator
+```
+
+*(Optional workspace-only install: clone into `<your-workspace>/.agents/skills/stickman-generator` instead.)*
+
+---
+
+### 3. Install Python Dependencies & Chromium
+
+Inside the cloned skill folder, create/activate a virtual environment (recommended) and install dependencies:
+
+#### Windows (PowerShell)
+```powershell
+python -m venv "$env:USERPROFILE\WhiteboardFilms\.tools\venv"
+& "$env:USERPROFILE\WhiteboardFilms\.tools\venv\Scripts\python.exe" -m pip install -r requirements.txt
+& "$env:USERPROFILE\WhiteboardFilms\.tools\venv\Scripts\playwright.exe" install chromium
+```
+
+#### macOS / Linux
+```bash
+python3 -m venv ~/WhiteboardFilms/.tools/venv
+source ~/WhiteboardFilms/.tools/venv/bin/activate
+pip install -r requirements.txt
+playwright install chromium
+```
+
+*(Note: `tools/cli.py` automatically detects `~/WhiteboardFilms/.tools/venv` whenever invoked with system `python`. You can override that path with `WHITEBOARD_HOME` or install `requirements.txt` into your active environment directly.)*
+
+---
+
+### 4. Configure Gemini TTS Key & Google Flow
+
+1. **Gemini API Key (for Voice Narration TTS)**:
+   - Get a Gemini API key from [Google AI Studio](https://aistudio.google.com/).
+   - Set it as an environment variable `GEMINI_API_KEY`:
+     - **Windows**: `setx GEMINI_API_KEY "your_api_key_here"`
+     - **macOS/Linux**: `export GEMINI_API_KEY="your_api_key_here"` (add to `~/.zshrc` or `~/.bashrc`)
+   - *Or* save the key directly in `~/.flow-mcp/gemini-key` (Windows: `%USERPROFILE%\.flow-mcp\gemini-key`).
+2. **Google Flow Artwork (`flow-mcp`)**:
+   - Ensure your `flow-mcp` Chrome window is running and signed in to Google Flow.
+   - `tools/generate_all_slides.mjs` automatically looks for `~/flow-mcp/dist/flow.js` (or set `FLOW_MCP_PATH` to point to `flow.js`).
+   - When running via Antigravity, the agent can also invoke the `flow_agent_images` MCP tool directly.
+
+---
+
+## ▶️ How to Run It
+
+### Option A: Zero-Input Autonomous Mode (Recommended — Inside Antigravity)
+
+Open any empty or target output folder in Antigravity and simply prompt:
+
+* **To make a 1-Minute Vertical Short (`1080x1920`, `9:16`)**:
+  > *"Generate a stickman short video"*
+* **To make a 10-Minute Long-Form Video (`1920x1080` video, `1920x1024` slides, + companion short + thumbnail)**:
+  > *"Generate a 10 minute long-form stickman video"*
+* **To request a specific topic**:
+  > *"Make a short on The Spotlight Effect"* or *"Make a long-form video on Parkinson's Law"*
+
+**Zero user input is required after your prompt.** The agent will automatically:
+1. Score and pick the catchiest unproduced topic from `topics/example_topics.json` (verifying zero repeats against `topics/completed_topics.json`).
+2. Write the script (`Name First -> Imagine...`) and paced storyboard (`slides.json`).
+3. Generate TTS voice narration + Faster-Whisper word-level timestamps.
+4. Generate editorial stickman artwork via Flow and enforce exact `1080x1920` (short) or `1920x1024` (long) dimensions.
+5. Select aesthetic ambient background music, apply a 2.5s crossfade loop, and mix audio (`-14.0 LUFS` voice / `-29.0 dB` music).
+6. Render 60fps MP4(s) with **always-on synced word-highlighted subtitles**.
+7. Extract the companion `1080x1920` vertical Short and render the `1920x1080` YouTube thumbnail (for long-form).
+8. Generate `<slug>-caption.txt` (caption + 5 hashtags), update `completed_topics.json`, and **delete all scratch folders**.
+
+### Option B: CLI Quick Reference (Manual / Scripted Runs)
 
 ```bash
 # 1. Auto-pick the catchiest uncompleted topic & create a Short (1080x1920, 9:16)
