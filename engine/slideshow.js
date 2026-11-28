@@ -164,8 +164,8 @@
   function buildSubtitleCues(words) {
     if (!SUBTITLES_ENABLED || !words || !words.length) return [];
     const isPortrait = H > W;
-    const maxWords = isPortrait ? 4 : 6;
-    const maxChars = isPortrait ? 28 : 48;
+    const maxWords = isPortrait ? 3 : 6;
+    const maxChars = isPortrait ? 22 : 44;
     const cues = [];
     let buf = [];
     let charCount = 0;
@@ -215,18 +215,18 @@
   let subOverlay = null;
   if (SUBTITLES_ENABLED && subtitleCues.length > 0) {
     const isPortrait = H > W;
-    const fontSize = isPortrait ? Math.round(W * 0.042) : Math.round(H * 0.034);
-    const bottomPos = isPortrait ? `${Math.round(H * 0.11)}px` : '30px';
-    const maxWidth = isPortrait ? '88%' : '78%';
+    const fontSize = isPortrait ? Math.round(W * 0.064) : Math.round(H * 0.050);
+    const strokeW = isPortrait ? 10 : 8;
+    const sideMargin = 110;
+    const bottomPos = isPortrait ? `${Math.max(480, Math.round(H * 0.26))}px` : '42px';
 
     subOverlay = document.createElement('div');
     subOverlay.id = 'subtitle-overlay';
     subOverlay.style.cssText = `
       position: absolute;
-      left: 50%;
+      left: ${sideMargin}px;
+      right: ${sideMargin}px;
       bottom: ${bottomPos};
-      transform: translateX(-50%);
-      max-width: ${maxWidth};
       z-index: 25;
       pointer-events: none;
       display: none;
@@ -234,17 +234,19 @@
     `;
     subOverlay.innerHTML = `<div id="subtitle-pill" style="
       display: inline-block;
-      background: rgba(15, 23, 42, 0.90);
-      border: 3px solid #0F172A;
-      border-radius: 14px;
-      padding: ${isPortrait ? '12px 24px' : '10px 22px'};
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.24);
+      background: transparent;
+      border: none;
+      padding: 0;
+      box-shadow: none;
       font-family: 'Inter', 'Segoe UI', 'Arial Rounded MT Bold', system-ui, sans-serif;
       font-size: ${fontSize}px;
-      font-weight: 800;
-      line-height: 1.3;
+      font-weight: 900;
+      line-height: 1.25;
       color: #FFFFFF;
       letter-spacing: 0.01em;
+      -webkit-text-stroke: ${strokeW}px #0F172A;
+      paint-order: stroke fill;
+      text-shadow: 0 4px 12px rgba(15, 23, 42, 0.38);
     "></div>`;
     viewport.appendChild(subOverlay);
   }

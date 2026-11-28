@@ -13,7 +13,8 @@ Designed to run completely automatically without user prompts—picking the catc
   - **Laptop / Long-Form (`16:9` Widescreen)**: **1920 × 1024 pixels** (`16:9` landscape) slides rendered cleanly inside a **1920 × 1080** HD canvas with rich 2D environmental details and warm cream (`#FBF6EF`) fill.
   - **Separate Short Images**: In long-form projects, the companion short **generates its own dedicated 1080×1920 (`9:16`) vertical images** (`short_slide_*.png`), never reusing or letterboxing 16:9 widescreen images!
 - **💬 Always-On Word-Synced Subtitles**:
-  - Every generated video (Short, Long-Form, and Companion Short) renders **crisp, high-contrast phrase subtitles** with real-time yellow word highlighting (`#FACC15`) in an ink-bordered slate pill (`rgba(15, 23, 42, 0.90)`), aligned deterministically to Faster-Whisper word timestamps.
+  - Every generated video (Short, Long-Form, and Companion Short) renders **large, center-aligned, transparent-background subtitles** (no background box) with crisp dark ink outlines, white text, and real-time yellow word highlighting (`#FACC15`) aligned to Faster-Whisper word timestamps.
+  - On **1080×1920 Shorts**, captions are sized big (`~69px`), centered at **~65–72% from the top** with **110px side margins** and **~500px clear bottom margin**.
 - **🤖 Zero-Input Autonomous Execution**:
   - Needs **zero user input** throughout production: automatically scores and selects the **catchiest uncompleted topic** (`python tools/cli.py topics next`), writes script + storyboard, generates narration + artwork, normalizes resolutions, renders with subtitles, extracts companion short + thumbnail (if long), cleans up temp files, and updates the topic ledger.
 - **🚨 Mandatory Hook Formula (Name First, Then Imagine)**:

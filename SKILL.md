@@ -119,9 +119,12 @@ For every long-format video, a dedicated 1920x1080 YouTube thumbnail **MUST ALWA
 > - **Companion Short**: NEVER reuses 16:9 widescreen images; separate `1080x1920` (`9:16`) images are always generated specifically for the companion short.
 
 ### 2. Always-On Synced Subtitles
-- **Every generated video** (Short, Long-Form, and Companion Short) includes **word-highlighted phrase subtitles** automatically synced to `voice/words.json`.
-- Rendered deterministically at 60 FPS inside `engine/slideshow.js` in a high-contrast slate pill (`rgba(15, 23, 42, 0.90)`) with white text and bright yellow (`#FACC15`) active spoken word highlighting.
-- Automatically positioned in the mobile safe zone (`bottom: 11%` on `1080x1920`) and bottom subtitle zone (`bottom: 30px` on `1920x1080`).
+- **Every generated video** (Short, Long-Form, and Companion Short) includes **large, transparent-background word-highlighted captions** automatically synced to `voice/words.json`.
+- Rendered deterministically at 60 FPS inside `engine/slideshow.js` with **no background box**—bold white typography (`#FFFFFF`) with crisp `#0F172A` dark ink outline (`paint-order: stroke fill`) and bright yellow (`#FACC15`) active spoken word highlighting.
+- **Exact Placement**:
+  * **Horizontal**: Center aligned with **110px side margins** (100–120px safe zone).
+  * **Vertical (Shorts `1080x1920`)**: Positioned **~65–72% from the top** (`~69px` font size), keeping **~500px clear bottom margin** (`bottom: 500px`, clearing ≥450–500px for mobile UI overlays).
+  * **Long-Form (`1920x1080`)**: Centered in the bottom zone (`~54px` font size, `110px` side margins).
 
 ### 2. Slide 01 Opening Rule (Title Card)
 - **Slide 01** is the viewer's very first impression. It MUST be a compelling, high-CTR **Title Card**.
